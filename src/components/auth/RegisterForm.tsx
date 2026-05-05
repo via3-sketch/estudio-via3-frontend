@@ -3,19 +3,62 @@
 import GoogleButton from "./GoogleButton";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import { registerUser } from "@/services/auth.service";
 
 export default function RegisterForm() {
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const payload = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+      address: formData.get("address"),
+      phone: Number(formData.get("phone")),
+      country: formData.get("country"),
+      city: formData.get("city"),
+    };
+
+    try {
+      await registerUser(payload);
+      alert("Usuario creado correctamente");
+    } catch (err: any) {
+      console.log(err);
+      alert("Error al registrarse");
+    }
+  };
+
   return (
-    <form className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
 
       <GoogleButton />
 
       <div className="text-center text-gray-500">o</div>
 
-      <Input type="text" placeholder="Nombre completo" />
-      <Input type="email" placeholder="Correo electrónico" />
-      <Input type="password" placeholder="Contraseña" />
-      <Input type="password" placeholder="Confirmar contraseña" />
+      <div className="grid grid-cols-2 gap-4">
+
+        <div className="col-span-2">
+          <Input name="name" type="text" placeholder="Nombre completo" />
+        </div>
+
+        <div className="col-span-2">
+          <Input name="email" type="email" placeholder="Correo electrónico" />
+        </div>
+
+        <Input name="password" type="password" placeholder="Contraseña" />
+        <Input name="confirmPassword" type="password" placeholder="Confirmar contraseña" />
+
+        <Input name="address" type="text" placeholder="Dirección" />
+        <Input name="phone" type="tel" placeholder="Teléfono" />
+
+        <Input name="country" type="text" placeholder="País" />
+        <Input name="city" type="text" placeholder="Ciudad" />
+
+      </div>
 
       <div className="flex items-start gap-2 text-sm text-gray-400">
         <input type="checkbox" className="mt-1 accent-[#C7962D]" />

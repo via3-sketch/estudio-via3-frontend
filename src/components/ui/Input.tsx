@@ -1,24 +1,17 @@
 "use client";
 
-type InputProps = {
-  type?: string;
-  placeholder?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
+import React from "react";
+
+type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export default function Input({
   type = "text",
-  placeholder,
-  value,
-  onChange,
+  ...props
 }: InputProps) {
   return (
     <input
       type={type}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
+      {...props}
       className="
         w-full 
         p-3 
