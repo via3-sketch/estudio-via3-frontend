@@ -4,6 +4,7 @@ import GoogleButton from "./GoogleButton";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { registerUser } from "@/services/auth.service";
+import { registerSchema } from "@/validations/register.validations";
 
 export default function RegisterForm() {
 
@@ -18,13 +19,20 @@ export default function RegisterForm() {
       password: formData.get("password"),
       confirmPassword: formData.get("confirmPassword"),
       address: formData.get("address"),
-      phone: Number(formData.get("phone")),
+      phone: formData.get("phone")?.toString(),
       country: formData.get("country"),
       city: formData.get("city"),
     };
 
+   const result = registerSchema.safeParse(payload);
+
+     if (!result.success) {
+     alert(result.error.issues[0].message);
+     return;
+  }
+
     try {
-      await registerUser(payload);
+      await registerUser(result.data);
       alert("Usuario creado correctamente");
     } catch (err: any) {
       console.log(err);

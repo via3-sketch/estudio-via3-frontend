@@ -4,6 +4,7 @@ import GoogleButton from "./GoogleButton";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { loginUser } from "@/services/auth.service";
+import { loginSchema } from "@/validations/login.validations";
 
 export default function LoginForm() {
 
@@ -13,12 +14,19 @@ export default function LoginForm() {
     const formData = new FormData(e.currentTarget);
 
     const payload = {
-      email: String(formData.get("email")),
-      password: String(formData.get("password")),
+     email: formData.get("email")?.toString() || "",
+     password: formData.get("password")?.toString() || "",
     };
 
+       const result = loginSchema.safeParse(payload);
+    
+         if (!result.success) {
+         alert(result.error.issues[0].message);
+         return;
+      }
+
     try {
-      const data = await loginUser(payload);
+      const data = await loginUser(result.data);
 
      
       localStorage.setItem("token", data.access_token);
