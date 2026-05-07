@@ -54,11 +54,15 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
+
       <GoogleButton />
 
-      <div className="text-center text-gray-500">o</div>
+      <div className="text-center text-gray-500">
+        o
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
+
         <div className="col-span-2">
           <Input
             name="name"
@@ -99,11 +103,57 @@ export default function RegisterForm() {
           placeholder="Teléfono"
         />
 
-        <Input
+        <select
           name="country"
-          type="text"
-          placeholder="País"
-        />
+          defaultValue=""
+          className="
+            w-full
+            rounded-xl
+            border
+            border-white/10
+            bg-[#0D0D0D]
+            px-4
+            py-3
+            text-sm
+            text-white
+            outline-none
+            transition
+            focus:border-[#C7962D]
+          "
+        >
+          <option value="" disabled>
+            🌍 Seleccionar país
+          </option>
+
+          <option value="Argentina">
+            🇦🇷 Argentina
+          </option>
+
+          <option value="Uruguay">
+            🇺🇾 Uruguay
+          </option>
+
+          <option value="Chile">
+            🇨🇱 Chile
+          </option>
+
+          <option value="Brasil">
+            🇧🇷 Brasil
+          </option>
+
+          <option value="México">
+            🇲🇽 México
+          </option>
+
+          <option value="España">
+            🇪🇸 España
+          </option>
+
+          <option value="Estados Unidos">
+            🇺🇸 Estados Unidos
+          </option>
+
+        </select>
 
         <Input
           name="city"
@@ -118,9 +168,11 @@ export default function RegisterForm() {
             placeholder="Empresa"
           />
         </div>
+
       </div>
 
       <div className="flex items-start gap-2 text-sm text-gray-400">
+
         <input
           type="checkbox"
           className="mt-1 accent-[#C7962D]"
@@ -128,24 +180,35 @@ export default function RegisterForm() {
 
         <span>
           Acepto los{" "}
+
           <span className="text-[#C7962D] cursor-pointer hover:underline">
             Términos y Condiciones
           </span>{" "}
+
           y la{" "}
+
           <span className="text-[#C7962D] cursor-pointer hover:underline">
             Política de Privacidad
           </span>
+
         </span>
+
       </div>
 
-      <Button type="submit">Crear cuenta</Button>
+      <Button type="submit">
+        Crear cuenta
+      </Button>
 
       <p className="text-sm text-gray-400 text-center">
+
         ¿Ya tenés cuenta?{" "}
+
         <span className="text-[#C7962D] cursor-pointer hover:underline">
           Iniciar sesión
         </span>
+
       </p>
+
     </form>
   );
 }
