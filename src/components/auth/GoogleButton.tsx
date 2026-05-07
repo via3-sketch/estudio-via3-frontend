@@ -1,15 +1,46 @@
-export default function GoogleButton() {
+"use client";
+
+import { GoogleLogin } from "@react-oauth/google";
+
+export default function GoogleAuthButton() {
+  const handleSuccess = async (credentialResponse: any) => {
+    try {
+      const token = credentialResponse.credential;
+
+      const response = await fetch(
+        "http://localhost:8000/auth/google",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Usuario autenticado:", data);
+    } catch (error) {
+      console.error("Error autenticando con Google:", error);
+    }
+  };
+
   return (
-    <button
-      type="button"
-      className="w-full flex items-center justify-center gap-3 border border-gray-600 p-3 rounded hover:bg-gray-800 transition"
-    >
-      <img
-        src="https://www.svgrepo.com/show/475656/google-color.svg"
-        alt="google"
-        className="w-5"
+    <div className="flex justify-center items-center">
+      <GoogleLogin
+        onSuccess={handleSuccess}
+        onError={() => {
+          console.log("Login Failed");
+        }}
+        theme="filled_black"
+        size="large"
+        text="continue_with"
+        shape="pill"
+        width="300"
       />
-      Continuar con Google
-    </button>
+    </div>
   );
 }
