@@ -1,46 +1,44 @@
 "use client";
 
-import { GoogleLogin } from "@react-oauth/google";
-
 export default function GoogleAuthButton() {
-  const handleSuccess = async (credentialResponse: any) => {
-    try {
-      const token = credentialResponse.credential;
-
-      const response = await fetch(
-        "http://localhost:8000/auth/google",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      console.log("Usuario autenticado:", data);
-    } catch (error) {
-      console.error("Error autenticando con Google:", error);
-    }
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8000/auth/google";
   };
 
   return (
     <div className="flex justify-center items-center">
-      <GoogleLogin
-        onSuccess={handleSuccess}
-        onError={() => {
-          console.log("Login Failed");
-        }}
-        theme="filled_black"
-        size="large"
-        text="continue_with"
-        shape="pill"
-        width="300"
-      />
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="
+          w-full
+          border
+          border-[#C7962D]/40
+          bg-[#111111]
+          hover:bg-[#181818]
+          text-white
+          rounded-xl
+          py-3
+          px-6
+          flex
+          items-center
+          justify-center
+          gap-3
+          font-medium
+          transition-all
+          duration-300
+          hover:border-[#C7962D]
+          hover:shadow-[0_0_20px_rgba(199,150,45,0.15)]
+        "
+      >
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google"
+          className="w-5 h-5"
+        />
+
+        <span>Continuar con Google</span>
+      </button>
     </div>
   );
 }
