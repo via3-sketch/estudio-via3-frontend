@@ -4,6 +4,7 @@ export const registerSchema = z.object({
   name: z
     .string()
     .min(1, "El nombre es obligatorio")
+    .min(2, "El nombre debe tener al menos 2 caracteres")
     .max(12, "El nombre no puede tener más de 12 caracteres"),
 
   email: z
@@ -26,7 +27,9 @@ export const registerSchema = z.object({
 
   address: z
     .string()
-    .min(1, "La dirección es obligatoria"),
+    .min(1, "La dirección es obligatoria")
+    .min(2, "La dirección debe tener al menos 2 caracteres")
+    .max(50, "La dirección no puede tener más de 50 caracteres"),
 
   phone: z
     .string()
@@ -35,11 +38,16 @@ export const registerSchema = z.object({
 
   country: z
     .string()
-    .min(1, "El país es obligatorio"),
+    .min(1, "El país es obligatorio")
+    .min(2, "El país debe tener al menos 2 caracteres")
+    .max(20, "El país no puede tener más de 20 caracteres"),
 
   city: z
     .string()
-    .min(1, "La ciudad es obligatoria"),
+    .min(1, "La ciudad es obligatoria")
+    .min(2, "La ciudad debe tener al menos 2 caracteres")
+    .max(20, "La ciudad no puede tener más de 20 caracteres"),
+
 })
 .refine((data) => data.password === data.confirmPassword, {
   message: "Las contraseñas no coinciden",
