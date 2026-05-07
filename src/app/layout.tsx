@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { GoogleProvider } from "./google";
 
 export default function RootLayout({
   children,
@@ -11,6 +12,8 @@ export default function RootLayout({
     <html lang="es">
       <body className="bg-[#070707] text-white flex flex-col min-h-screen">
 
+        <GoogleProvider>
+
         <Navbar />
 
         <main className="pt-16 flex-1">
@@ -18,6 +21,8 @@ export default function RootLayout({
         </main>
 
         <Footer />
+
+        </GoogleProvider>
 
       </body>
     </html>
