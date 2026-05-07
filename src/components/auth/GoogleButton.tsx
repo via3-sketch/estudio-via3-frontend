@@ -8,7 +8,7 @@ export default function GoogleAuthButton() {
       const token = credentialResponse.credential;
 
       const response = await fetch(
-        "http://localhost:3000/auth/google",
+        "http://localhost:8000/auth/google",
         {
           method: "POST",
           headers: {
