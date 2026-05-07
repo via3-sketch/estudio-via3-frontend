@@ -59,7 +59,6 @@ export default function FeaturesSection() {
     <section className="bg-[#070707] text-white px-6 py-24">
       <div className="mx-auto max-w-7xl">
 
-        {/* Título */}
         <div className="max-w-xl mb-12">
           <h2 className="text-3xl md:text-4xl font-semibold mb-4">
             Todo lo que podés hacer en la plataforma

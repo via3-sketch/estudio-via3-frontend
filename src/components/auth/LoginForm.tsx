@@ -40,7 +40,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
       <GoogleButton />
 

@@ -44,7 +44,7 @@ export default function Navbar() {
             </button>
 
             <Link
-              href="/auth"
+              href="/autenticacion"
               className="hidden md:block px-5 py-2 rounded-md text-sm font-semibold bg-[#C7962D] text-black hover:opacity-90 transition"
             >
               Ingresar
@@ -81,7 +81,7 @@ export default function Navbar() {
           </Link>
 
           <Link
-            href="/auth"
+            href="/autenticacion"
             onClick={() => setOpen(false)}
             className="mt-4 px-5 py-3 rounded-md text-center font-semibold bg-[#C7962D] text-black hover:opacity-90 transition"
           >
@@ -93,3 +93,4 @@ export default function Navbar() {
     </header>
   );
 }
+

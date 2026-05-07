@@ -14,15 +14,15 @@ export default function RegisterForm() {
     const formData = new FormData(e.currentTarget);
 
     const payload = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      password: formData.get("password"),
-      confirmPassword: formData.get("confirmPassword"),
-      address: formData.get("address"),
-      phone: formData.get("phone")?.toString(),
-      country: formData.get("country"),
-      city: formData.get("city"),
-    };
+      name: formData.get("name")?.toString() || "",
+      email: formData.get("email")?.toString() || "",
+      password: formData.get("password")?.toString() || "",
+      confirmPassword: formData.get("confirmPassword")?.toString() || "",
+      address: formData.get("address")?.toString() || "",
+      phone: formData.get("phone")?.toString() || "",
+      country: formData.get("country")?.toString() || "",
+      city: formData.get("city")?.toString() || "",
+  };
 
    const result = registerSchema.safeParse(payload);
 
@@ -41,7 +41,7 @@ export default function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-5">
 
       <GoogleButton />
 
