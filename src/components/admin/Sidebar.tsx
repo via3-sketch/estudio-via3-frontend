@@ -15,7 +15,7 @@ export default function Sidebar() {
 
   return (
     <aside className="w-64 border-r border-white/10 bg-black/80 p-6 flex flex-col justify-between">
-
+      
       <div>
 
         <h2 className="text-xl font-semibold mb-6">
@@ -30,16 +30,32 @@ export default function Sidebar() {
             Dashboard
           </Link>
 
-          <Link href="/admin/users" className={linkClass("/admin/users")}>
+          <Link
+            href="/admin/users"
+            className={linkClass("/admin/users")}
+          >
             Usuarios
           </Link>
 
-          <Link href="/admin/services" className={linkClass("/admin/services")}>
+          <Link
+            href="/admin/services"
+            className={linkClass("/admin/services")}
+          >
             Servicios
           </Link>
 
-          <Link href="/admin/requests" className={linkClass("/admin/requests")}>
+          <Link
+            href="/admin/requests"
+            className={linkClass("/admin/requests")}
+          >
             Solicitudes
+          </Link>
+
+          <Link
+            href="/admin/meetings"
+            className={linkClass("/admin/meetings")}
+          >
+            Reuniones
           </Link>
 
           <div className="text-gray-500 px-3 py-2">

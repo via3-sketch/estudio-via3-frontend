@@ -23,7 +23,7 @@ export const loginUser = (payload: {
 export const completeProfile = (
   id: string,
   payload: {
-    phone: number;
+    phone: string;
 
     country: string;
 

@@ -1,9 +1,8 @@
 import "./globals.css";
 
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-
 import { UserProvider } from "@/context/UserContext";
+
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
 
 export default function RootLayout({
   children,
@@ -16,13 +15,9 @@ export default function RootLayout({
 
         <UserProvider>
 
-          <Navbar />
-
-          <main className="pt-16 flex-1">
+          <LayoutWrapper>
             {children}
-          </main>
-
-          <Footer />
+          </LayoutWrapper>
 
         </UserProvider>
 

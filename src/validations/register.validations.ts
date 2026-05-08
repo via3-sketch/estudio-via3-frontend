@@ -38,12 +38,21 @@ export const registerSchema = z
       .min(1, "Debes confirmar la contraseña"),
 
     phone: z
-      .number()
+      .string()
       .min(1, "El teléfono es obligatorio"),
-
     country: z
       .string()
       .min(1, "El país es obligatorio"),
+
+      address: z
+      .string()
+      .min(5, "La dirección debe tener al menos 5 caracteres")
+      .max(50, "La dirección no puede tener más de 50 caracteres"),
+
+    city: z
+      .string()
+      .min(3, "La ciudad debe tener al menos 3 caracteres")
+      .max(20, "La ciudad no puede tener más de 20 caracteres"),
 
     companyName: z
       .string()
