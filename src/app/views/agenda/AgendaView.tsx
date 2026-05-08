@@ -3,12 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { createMeeting } from "@/services/meetings.service";
+import { useUser } from "@/hooks/useUser";
+
 type AgendaViewProps = {
   id: string;
 };
 
 export default function AgendaView({ id }: AgendaViewProps) {
   const router = useRouter();
+
+  const { user } = useUser();
+
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     fecha: "",
@@ -22,15 +29,32 @@ export default function AgendaView({ id }: AgendaViewProps) {
     });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-  
-    localStorage.setItem(`agenda-${id}`, JSON.stringify(form));
+    try {
+      setLoading(true);
 
-    
+      const token = localStorage.getItem("token");
 
-    router.push(`/mis-solicitudes/${id}`);
+      if (!token || !user?.id) return;
+
+      await createMeeting(
+        {
+          date: form.fecha,
+          time: form.horario,
+          targetUserId: user.id,
+        },
+        token
+      );
+
+      router.push(`/mis-solicitudes/${id}`);
+
+    } catch (error) {
+      console.error("Error creando reunión", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,10 +69,16 @@ export default function AgendaView({ id }: AgendaViewProps) {
           Seleccioná una fecha y horario para coordinar la reunión inicial.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
 
           <div>
-            <label className="text-sm text-gray-300">Fecha</label>
+            <label className="text-sm text-gray-300">
+              Fecha
+            </label>
+
             <input
               type="date"
               name="fecha"
@@ -59,7 +89,10 @@ export default function AgendaView({ id }: AgendaViewProps) {
           </div>
 
           <div>
-            <label className="text-sm text-gray-300">Horario</label>
+            <label className="text-sm text-gray-300">
+              Horario
+            </label>
+
             <input
               type="time"
               name="horario"
@@ -71,9 +104,12 @@ export default function AgendaView({ id }: AgendaViewProps) {
 
           <button
             type="submit"
-            className="w-full py-4 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition"
+            disabled={loading}
+            className="w-full py-4 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition disabled:opacity-50"
           >
-            Confirmar reunión
+            {loading
+              ? "Agendando..."
+              : "Confirmar reunión"}
           </button>
 
         </form>

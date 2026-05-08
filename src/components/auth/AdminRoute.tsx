@@ -2,21 +2,16 @@
 
 import { useEffect } from "react";
 
-import {
-  usePathname,
-  useRouter,
-} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useUser } from "@/hooks/useUser";
 
-export default function ProtectedRoute({
+export default function AdminRoute({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const router = useRouter();
-
-  const pathname = usePathname();
 
   const {
     isAuthenticated,
@@ -25,29 +20,23 @@ export default function ProtectedRoute({
   } = useUser();
 
   useEffect(() => {
-    if (
-      isHydrated &&
-      !isAuthenticated
-    ) {
+    if (isHydrated && !isAuthenticated) {
       router.push("/autenticacion");
+      return;
     }
 
-    const isAdminRoute =
-      pathname.startsWith("/admin");
-
     if (
       isHydrated &&
-      isAdminRoute &&
-      user?.role !== "Admin"
+      isAuthenticated &&
+      user?.role !== "admin"
     ) {
       router.push("/");
     }
   }, [
     isAuthenticated,
     isHydrated,
-    router,
-    pathname,
     user,
+    router,
   ]);
 
   if (!isHydrated) {
@@ -55,6 +44,10 @@ export default function ProtectedRoute({
   }
 
   if (!isAuthenticated) {
+    return null;
+  }
+
+  if (user?.role !== "admin") {
     return null;
   }
 

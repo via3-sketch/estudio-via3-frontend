@@ -2,7 +2,6 @@ import ServiceCard from "./ServiceCard";
 
 import {
   FileText,
-  Calendar,
   BarChart3,
   Users,
   CreditCard,
@@ -16,42 +15,30 @@ export default function FeaturesSection() {
       description:
         "Completá un formulario y definí las necesidades de tu empresa",
       icon: FileText,
-      href: "/solicitudes",
     },
     {
-      title: "Agenda de reuniones",
+      title: "Seguimiento del proceso",
       description:
-        "Elegí fecha y horario para coordinar una reunión inicial",
-      icon: Calendar,
-      href: "/agenda",
-    },
-    {
-      title: "Seguimiento en tiempo real",
-      description:
-        "Visualizá el estado de cada capacitación en todo momento",
+        "Consultá el estado de tus capacitaciones y solicitudes en tiempo real",
       icon: BarChart3,
-      href: "/seguimiento",
     },
     {
-      title: "Gestión de participantes",
+      title: "Capacitaciones personalizadas",
       description:
-        "Indicá cantidad de personas y objetivos de formación",
+        "Adaptamos cada formación según los objetivos y necesidades de tu equipo",
       icon: Users,
-      href: "/participantes",
     },
     {
       title: "Pagos online",
       description:
         "Confirmá el servicio realizando una seña o reserva",
       icon: CreditCard,
-      href: "/pagos",
     },
     {
       title: "Notificaciones y materiales",
       description:
-        "Recibí avisos y accedé a propuestas y contenidos digitales",
+        "Recibí avisos, propuestas y contenidos digitales desde la plataforma",
       icon: Bell,
-      href: "/notificaciones",
     },
   ];
 
@@ -76,7 +63,6 @@ export default function FeaturesSection() {
               title={feature.title}
               description={feature.description}
               icon={feature.icon}
-              href={feature.href}
             />
           ))}
         </div>
