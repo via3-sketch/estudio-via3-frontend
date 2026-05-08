@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-export const registerSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, "El nombre es obligatorio")
-      .max(12, "El nombre no puede tener más de 12 caracteres"),
+export const registerSchema = z.object({
+  name: z
+    .string()
+    .min(1, "El nombre es obligatorio")
+    .max(12, "El nombre no puede tener más de 12 caracteres"),
 
     email: z
       .string()
@@ -37,20 +36,24 @@ export const registerSchema = z
       .string()
       .min(1, "Debes confirmar la contraseña"),
 
-    phone: z
-      .number()
-      .min(1, "El teléfono es obligatorio"),
+  address: z
+    .string()
+    .min(1, "La dirección es obligatoria"),
 
-    country: z
-      .string()
-      .min(1, "El país es obligatorio"),
+  phone: z
+    .string()
+    .min(1, "El teléfono es obligatorio")
+    .regex(/^[0-9]+$/, "El teléfono debe contener solo números"),
 
-    companyName: z
-      .string()
-      .min(1, "La empresa es obligatoria"),
-  })
+  country: z
+    .string()
+    .min(1, "El país es obligatorio"),
 
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
+  city: z
+    .string()
+    .min(1, "La ciudad es obligatoria"),
+})
+.refine((data) => data.password === data.confirmPassword, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmPassword"],
+});
