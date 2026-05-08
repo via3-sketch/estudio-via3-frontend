@@ -7,7 +7,6 @@ import { registerUser } from "@/services/auth.service";
 import { registerSchema } from "@/validations/register.validations";
 
 export default function RegisterForm() {
-
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
@@ -15,27 +14,40 @@ export default function RegisterForm() {
 
     const payload = {
       name: formData.get("name")?.toString() || "",
+
       email: formData.get("email")?.toString() || "",
+
       password: formData.get("password")?.toString() || "",
-      confirmPassword: formData.get("confirmPassword")?.toString() || "",
+
+      confirmPassword:
+        formData.get("confirmPassword")?.toString() || "",
+
       address: formData.get("address")?.toString() || "",
-      phone: formData.get("phone")?.toString() || "",
-      country: formData.get("country")?.toString() || "",
+
       city: formData.get("city")?.toString() || "",
-  };
 
-   const result = registerSchema.safeParse(payload);
+      phone: Number(formData.get("phone")) || 0,
 
-     if (!result.success) {
-     alert(result.error.issues[0].message);
-     return;
-  }
+      country: formData.get("country")?.toString() || "",
+
+      companyName:
+        formData.get("companyName")?.toString() || "",
+    };
+
+    const result = registerSchema.safeParse(payload);
+
+    if (!result.success) {
+      alert(result.error.issues[0].message);
+      return;
+    }
 
     try {
       await registerUser(result.data);
+
       alert("Usuario creado correctamente");
     } catch (err: any) {
       console.log(err);
+
       alert("Error al registrarse");
     }
   };
@@ -45,50 +57,156 @@ export default function RegisterForm() {
 
       <GoogleButton />
 
-      <div className="text-center text-gray-500">o</div>
+      <div className="text-center text-gray-500">
+        o
+      </div>
 
       <div className="grid grid-cols-2 gap-4">
 
         <div className="col-span-2">
-          <Input name="name" type="text" placeholder="Nombre completo" />
+          <Input
+            name="name"
+            type="text"
+            placeholder="Nombre completo"
+          />
         </div>
 
         <div className="col-span-2">
-          <Input name="email" type="email" placeholder="Correo electrónico" />
+          <Input
+            name="email"
+            type="email"
+            placeholder="Correo electrónico"
+          />
         </div>
 
-        <Input name="password" type="password" placeholder="Contraseña" />
-        <Input name="confirmPassword" type="password" placeholder="Confirmar contraseña" />
+        <Input
+          name="password"
+          type="password"
+          placeholder="Contraseña"
+        />
 
-        <Input name="address" type="text" placeholder="Dirección" />
-        <Input name="phone" type="tel" placeholder="Teléfono" />
+        <Input
+          name="confirmPassword"
+          type="password"
+          placeholder="Confirmar contraseña"
+        />
 
-        <Input name="country" type="text" placeholder="País" />
-        <Input name="city" type="text" placeholder="Ciudad" />
+        <Input
+          name="address"
+          type="text"
+          placeholder="Dirección"
+        />
+
+        <Input
+          name="phone"
+          type="tel"
+          placeholder="Teléfono"
+        />
+
+        <select
+          name="country"
+          defaultValue=""
+          className="
+            w-full
+            rounded-xl
+            border
+            border-white/10
+            bg-[#0D0D0D]
+            px-4
+            py-3
+            text-sm
+            text-white
+            outline-none
+            transition
+            focus:border-[#C7962D]
+          "
+        >
+          <option value="" disabled>
+            🌍 Seleccionar país
+          </option>
+
+          <option value="Argentina">
+            🇦🇷 Argentina
+          </option>
+
+          <option value="Uruguay">
+            🇺🇾 Uruguay
+          </option>
+
+          <option value="Chile">
+            🇨🇱 Chile
+          </option>
+
+          <option value="Brasil">
+            🇧🇷 Brasil
+          </option>
+
+          <option value="México">
+            🇲🇽 México
+          </option>
+
+          <option value="España">
+            🇪🇸 España
+          </option>
+
+          <option value="Estados Unidos">
+            🇺🇸 Estados Unidos
+          </option>
+
+        </select>
+
+        <Input
+          name="city"
+          type="text"
+          placeholder="Ciudad"
+        />
+
+        <div className="col-span-2">
+          <Input
+            name="companyName"
+            type="text"
+            placeholder="Empresa"
+          />
+        </div>
 
       </div>
 
       <div className="flex items-start gap-2 text-sm text-gray-400">
-        <input type="checkbox" className="mt-1 accent-[#C7962D]" />
+
+        <input
+          type="checkbox"
+          className="mt-1 accent-[#C7962D]"
+        />
+
         <span>
           Acepto los{" "}
+
           <span className="text-[#C7962D] cursor-pointer hover:underline">
             Términos y Condiciones
           </span>{" "}
+
           y la{" "}
+
           <span className="text-[#C7962D] cursor-pointer hover:underline">
             Política de Privacidad
           </span>
+
         </span>
+
       </div>
 
-      <Button type="submit">Crear cuenta</Button>
+      <Button type="submit">
+        Crear cuenta
+      </Button>
 
       <p className="text-sm text-gray-400 text-center">
+
         ¿Ya tenés cuenta?{" "}
+
         <span className="text-[#C7962D] cursor-pointer hover:underline">
           Iniciar sesión
         </span>
+
       </p>
 
     </form>
