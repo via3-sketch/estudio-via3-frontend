@@ -1,15 +1,44 @@
-export default function GoogleButton() {
+"use client";
+
+export default function GoogleAuthButton() {
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8000/auth/google";
+  };
+
   return (
-    <button
-      type="button"
-      className="w-full flex items-center justify-center gap-3 border border-gray-600 p-3 rounded hover:bg-gray-800 transition"
-    >
-      <img
-        src="https://www.svgrepo.com/show/475656/google-color.svg"
-        alt="google"
-        className="w-5"
-      />
-      Continuar con Google
-    </button>
+    <div className="flex justify-center items-center">
+      <button
+        type="button"
+        onClick={handleGoogleLogin}
+        className="
+          w-full
+          border
+          border-[#C7962D]/40
+          bg-[#111111]
+          hover:bg-[#181818]
+          text-white
+          rounded-xl
+          py-3
+          px-6
+          flex
+          items-center
+          justify-center
+          gap-3
+          font-medium
+          transition-all
+          duration-300
+          hover:border-[#C7962D]
+          hover:shadow-[0_0_20px_rgba(199,150,45,0.15)]
+        "
+      >
+        <img
+          src="https://www.svgrepo.com/show/475656/google-color.svg"
+          alt="Google"
+          className="w-5 h-5"
+        />
+
+        <span>Continuar con Google</span>
+      </button>
+    </div>
   );
 }
