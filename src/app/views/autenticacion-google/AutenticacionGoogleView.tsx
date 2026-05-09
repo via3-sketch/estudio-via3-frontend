@@ -46,9 +46,9 @@ useEffect(() => {
       toast.error(
         "Error al autenticar con Google",
       );
-
+      setTimeout(() => {
       router.push("/login");
-
+      },0)
       return;
     }
 
@@ -59,6 +59,7 @@ useEffect(() => {
 
     login(token);
 
+    setTimeout(() => {
     if (isLogin === "true") {
       toast.success(
         "Sesión iniciada con Google",
@@ -68,6 +69,7 @@ useEffect(() => {
         "Cuenta creada con Google",
       );
     }
+  }, 0)
 
     if (!decoded.profileCompleted) {
       router.push("/completar-perfil");
