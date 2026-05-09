@@ -23,13 +23,15 @@ import { loginSchema } from "@/validations/login.validations";
 
 import { useUser } from "@/hooks/useUser";
 
+import { toast } from "sonner";
+
 type LoginFormProps = {
   onSwitchToRegister: () => void;
 };
 
 export default function LoginForm({
   onSwitchToRegister,
-}: LoginFormProps) {
+}: LoginFormProps) { 
   const router = useRouter();
 
   const { login } = useUser();
@@ -63,7 +65,7 @@ export default function LoginForm({
       loginSchema.safeParse(payload);
 
     if (!result.success) {
-      alert(
+      toast.error(
         result.error.issues[0].message,
       );
 
@@ -76,14 +78,12 @@ export default function LoginForm({
 
       login(data.access_token);
 
-      alert("Login exitoso");
+      toast.success("Login exitoso");
 
       router.push("/");
 
     } catch (err: any) {
-      console.log(err);
-
-      alert(
+      toast.error(
         "Credenciales incorrectas",
       );
     }
@@ -168,7 +168,7 @@ export default function LoginForm({
         <button
           type="button"
           onClick={onSwitchToRegister}
-          className="text-[#C7962D] hover:underline"
+          className="text-[#C7962D] hover:underline cursor-pointer"
         >
           Registrate
         </button>

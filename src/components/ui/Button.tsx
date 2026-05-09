@@ -28,6 +28,8 @@ export default function Button({
         font-medium
         text-black
 
+        cursor-pointer
+
         bg-linear-to-r from-[#C7962D] to-[#E0B84F]
 
         transition-all duration-200

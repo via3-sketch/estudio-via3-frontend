@@ -9,6 +9,10 @@ import {
 
 import { jwtDecode } from "jwt-decode";
 
+import { useRouter } from "next/navigation";
+
+import {toast} from "sonner";
+
 type DecodedToken = {
   id: string;
   email: string;
@@ -43,6 +47,8 @@ export function UserProvider({
   const [user, setUser] = useState<DecodedToken | null>(
     null
   );
+
+  const router = useRouter();
 
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -80,6 +86,9 @@ export function UserProvider({
     setToken(null);
 
     setUser(null);
+
+    router.push("/");
+    toast.success("Sesión cerrada exitosamente");
   };
 
   return (

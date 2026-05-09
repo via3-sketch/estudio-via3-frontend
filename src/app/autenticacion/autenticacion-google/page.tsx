@@ -1,4 +1,4 @@
-import AutenticacionGoogleView from "@/app/views/AutenticacionGoogle/AutenticacionGoogleView";
+import AutenticacionGoogleView from "@/app/views/autenticacion-google/AutenticacionGoogleView";
 
 export default function AutenticacionGooglePage() {
   return <AutenticacionGoogleView />;

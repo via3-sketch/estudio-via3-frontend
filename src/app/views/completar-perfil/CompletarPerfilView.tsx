@@ -3,6 +3,7 @@
 import CompleteProfileForm from "@/components/auth/CompleteProfileForm";
 
 export default function CompletarPerfilView() {
+  
   return (
     <main className="min-h-screen bg-[#070707] px-6 py-10 text-white">
 
