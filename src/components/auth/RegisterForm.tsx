@@ -33,6 +33,8 @@ export default function RegisterForm({
     setShowPassword,
   ] = useState(false);
 
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+
   const [
     showConfirmPassword,
     setShowConfirmPassword,
@@ -93,11 +95,16 @@ export default function RegisterForm({
           ?.toString() || "",
     };
 
+     if (!acceptedTerms) {
+      toast.warning("Debes aceptar los términos y condiciones");
+      return;
+    }
+
     const result =
       registerSchema.safeParse(payload);
 
     if (!result.success) {
-      toast.error(
+      toast.warning(
         result.error.issues[0].message,
       );
 
@@ -362,7 +369,9 @@ export default function RegisterForm({
 
         <input
           type="checkbox"
-          className="mt-1 accent-[#C7962D]"
+          className="mt-1 accent-[#C7962D] cursor-pointer"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
         />
 
         <span>

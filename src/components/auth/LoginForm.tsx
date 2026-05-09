@@ -65,7 +65,7 @@ export default function LoginForm({
       loginSchema.safeParse(payload);
 
     if (!result.success) {
-      toast.error(
+      toast.warning(
         result.error.issues[0].message,
       );
 
