@@ -25,6 +25,18 @@ import { useUser } from "@/hooks/useUser";
 
 import { toast } from "sonner";
 
+import { jwtDecode } from "jwt-decode";
+
+type DecodedToken = {
+  id: string;
+
+  email: string;
+
+  role: string;
+
+  profileCompleted: boolean;
+};
+
 type LoginFormProps = {
   onSwitchToRegister: () => void;
 };
@@ -76,9 +88,21 @@ export default function LoginForm({
       const data =
         await loginUser(result.data);
 
-      login(data.access_token);
+      const token =
+         data.access_token;
+
+      const decoded =
+      jwtDecode<DecodedToken>(token);
+
+      login(token);
 
       toast.success("Login exitoso");
+
+     if (!decoded.profileCompleted) {
+      router.push("/completar-perfil");
+
+      return;
+    }
 
       router.push("/");
 

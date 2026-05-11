@@ -29,7 +29,7 @@ export const registerSchema = z
         "La contraseña debe contener al menos un número"
       )
       .regex(
-        /[^A-Za-z0-9]/,
+        /^(?=.*[.,!@#$%^&*()_\-+=\[\]{};:'"\\|<>/?`~]).+$/,
         "La contraseña debe contener al menos un carácter especial"
       ),
 
@@ -39,7 +39,12 @@ export const registerSchema = z
 
     phone: z
       .string()
-      .min(1, "El teléfono es obligatorio"),
+      .min(1, "El teléfono es obligatorio")
+      .regex(
+      /^\+?[1-9]\d{7,14}$/,
+       "El teléfono debe ser un número internacional válido"
+       ),
+       
     country: z
       .string()
       .min(1, "El país es obligatorio"),
