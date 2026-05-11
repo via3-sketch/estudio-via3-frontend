@@ -19,6 +19,8 @@ import { registerUser } from "@/services/auth.service";
 
 import { registerSchema } from "@/validations/register.validations";
 
+import { toast } from "sonner";
+
 type RegisterFormProps = {
   onSwitchToLogin: () => void;
 };
@@ -30,6 +32,8 @@ export default function RegisterForm({
     showPassword,
     setShowPassword,
   ] = useState(false);
+
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const [
     showConfirmPassword,
@@ -91,11 +95,16 @@ export default function RegisterForm({
           ?.toString() || "",
     };
 
+     if (!acceptedTerms) {
+      toast.warning("Debes aceptar los términos y condiciones");
+      return;
+    }
+
     const result =
       registerSchema.safeParse(payload);
 
     if (!result.success) {
-      alert(
+      toast.warning(
         result.error.issues[0].message,
       );
 
@@ -111,16 +120,15 @@ export default function RegisterForm({
 
       setShowConfirmPassword(false);
 
-      alert(
+      toast.success(
         "Cuenta creada correctamente",
       );
 
       onSwitchToLogin();
 
     } catch (err: any) {
-      console.log(err);
 
-      alert("Error al registrarse");
+      toast.error("Error al registrarse");
     }
   };
 
@@ -361,7 +369,9 @@ export default function RegisterForm({
 
         <input
           type="checkbox"
-          className="mt-1 accent-[#C7962D]"
+          className="mt-1 accent-[#C7962D] cursor-pointer"
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
         />
 
         <span>
@@ -392,7 +402,7 @@ export default function RegisterForm({
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="text-[#C7962D] hover:underline"
+          className="text-[#C7962D] hover:underline cursor-pointer"
         >
           Iniciar sesión
         </button>

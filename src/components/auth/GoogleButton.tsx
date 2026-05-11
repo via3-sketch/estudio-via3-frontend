@@ -27,6 +27,7 @@ export default function GoogleAuthButton() {
           font-medium
           transition-all
           duration-300
+          cursor-pointer
           hover:border-[#C7962D]
           hover:shadow-[0_0_20px_rgba(199,150,45,0.15)]
         "

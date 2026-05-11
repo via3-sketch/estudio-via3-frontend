@@ -113,7 +113,7 @@ export default function Navbar() {
 
                 <button
                   onClick={logout}
-                  className="px-5 py-2 rounded-md text-sm font-semibold border border-[#C7962D] text-[#C7962D] hover:bg-[#C7962D] hover:text-black transition"
+                  className="px-5 py-2 rounded-md text-sm font-semibold border border-[#C7962D] text-[#C7962D] hover:bg-[#C7962D] hover:text-black transition cursor-pointer"
                 >
                   Cerrar sesión
                 </button>

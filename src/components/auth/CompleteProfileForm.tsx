@@ -8,7 +8,9 @@ import Input from "@/components/ui/Input";
 
 import Button from "@/components/ui/Button";
 
-import { completeProfile } from "@/services/auth.service";
+import { completeProfile } from "@/services/auth.service"; 
+
+import { toast } from "sonner";
 
 type DecodedToken = {
   id: string;
@@ -73,12 +75,14 @@ export default function CompleteProfileForm() {
     };
 
     try {
-      await completeProfile(
+      const res = await completeProfile(
         decoded.id,
         payload,
       );
 
-      alert(
+      localStorage.setItem("token", res.access_token);
+
+      toast.success(
         "Perfil completado",
       );
 
@@ -86,10 +90,10 @@ export default function CompleteProfileForm() {
 
       router.push("/");
 
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      toast.error(err.message)
 
-      alert(
+      toast.error(
         "Error al completar perfil",
       );
     }

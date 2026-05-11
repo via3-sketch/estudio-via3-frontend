@@ -3,6 +3,7 @@ import "./globals.css";
 import { UserProvider } from "@/context/UserContext";
 
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -13,15 +14,20 @@ export default function RootLayout({
     <html lang="es">
       <body className="bg-[#070707] text-white flex flex-col min-h-screen">
 
-        <UserProvider>
+            <UserProvider>
 
-          <LayoutWrapper>
-            {children}
-          </LayoutWrapper>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
 
-        </UserProvider>
+            </UserProvider>
+
+        <Toaster
+          richColors
+        />
 
       </body>
     </html>
   );
 }
+
