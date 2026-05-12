@@ -2,7 +2,7 @@
 
 export default function GoogleAuthButton() {
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8000/auth/google";
+    window.location.href = "https://estudio-via3-backend-production.up.railway.app/auth/google";
   };
 
   return (
