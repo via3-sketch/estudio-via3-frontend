@@ -77,7 +77,7 @@ export default function Navbar() {
 
               {isAdmin && (
                 <Link
-                  href="/admin"
+                  href="/admin/requests"
                   className="text-[#C7962D] hover:text-white transition font-medium"
                 >
                   Admin
@@ -172,7 +172,7 @@ export default function Navbar() {
 
           {isAdmin && (
             <Link
-              href="/admin"
+              href="/admin/requests"
               onClick={() =>
                 setOpen(false)
               }
