@@ -1,11 +1,17 @@
 import RequestDetailView from "@/app/views/admin/RequestDetailView";
 
-type Props = {
-  params: Promise<{ id: string }>;
-};
+interface Props {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-export default async function Page({ params }: Props) {
+export default async function RequestDetailPage({
+  params,
+}: Props) {
   const { id } = await params;
 
-  return <RequestDetailView id={id} />;
+  return (
+    <RequestDetailView id={id} />
+  );
 }

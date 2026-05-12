@@ -23,7 +23,13 @@ type Request = {
 
   context: string;
 
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status:
+    | "pending"
+    | "scheduled"
+    | "in_review"
+    | "awaiting_payment"
+    | "confirmed"
+    | "cancelled";
 
   user?: {
     companyName?: string;
@@ -31,14 +37,23 @@ type Request = {
 };
 
 const statusStyles = {
-  PENDING:
+  pending:
     "bg-yellow-500/10 text-yellow-400",
 
-  APPROVED:
+  confirmed:
     "bg-green-500/10 text-green-400",
 
-  REJECTED:
+  cancelled:
     "bg-red-500/10 text-red-400",
+
+  scheduled:
+    "bg-purple-500/10 text-purple-400",
+
+  in_review:
+    "bg-blue-500/10 text-blue-400",
+
+  awaiting_payment:
+    "bg-orange-500/10 text-orange-400",
 };
 
 export default function RequestsView() {
@@ -185,12 +200,21 @@ export default function RequestsView() {
                       }`}
                     >
                       {req.status ===
-                      "PENDING"
+                      "pending"
                         ? "Pendiente"
                         : req.status ===
-                          "APPROVED"
-                        ? "Aprobada"
-                        : "Rechazada"}
+                          "confirmed"
+                        ? "Confirmada"
+                        : req.status ===
+                          "cancelled"
+                        ? "Cancelada"
+                        : req.status ===
+                          "scheduled"
+                        ? "Agendada"
+                        : req.status ===
+                          "in_review"
+                        ? "En revisión"
+                        : "Esperando pago"}
                     </span>
 
                     <select
@@ -204,16 +228,28 @@ export default function RequestsView() {
                       }
                       className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300"
                     >
-                      <option value="PENDING">
+                      <option value="pending">
                         Pendiente
                       </option>
 
-                      <option value="APPROVED">
-                        Aprobada
+                      <option value="scheduled">
+                        Agendada
                       </option>
 
-                      <option value="REJECTED">
-                        Rechazada
+                      <option value="in_review">
+                        En revisión
+                      </option>
+
+                      <option value="awaiting_payment">
+                        Esperando pago
+                      </option>
+
+                      <option value="confirmed">
+                        Confirmada
+                      </option>
+
+                      <option value="cancelled">
+                        Cancelada
                       </option>
                     </select>
 

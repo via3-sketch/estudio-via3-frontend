@@ -2,31 +2,67 @@
 
 import Link from "next/link";
 
+import { useEffect, useState } from "react";
+
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
+import { getMyTrainingRequests } from "@/services/trainingRequests.service";
+
+interface TrainingRequest {
+  id: string;
+
+  status:
+    | "pending"
+    | "scheduled"
+    | "in_review"
+    | "awaiting_payment"
+    | "confirmed"
+    | "cancelled";
+
+  createdAt: string;
+
+  training: {
+    title: string;
+  };
+}
+
 export default function MisSolicitudesView() {
+  const [solicitudes, setSolicitudes] = useState<
+    TrainingRequest[]
+  >([]);
 
-  const stored =
-    typeof window !== "undefined"
-      ? localStorage.getItem("solicitudes")
-      : null;
+  const [loading, setLoading] =
+    useState(true);
 
-  const solicitudes = stored
-    ? JSON.parse(stored)
-    : [
-        {
-          id: "1",
-          categoria: "Liderazgo de equipos",
-          estado: "Pendiente",
-          fecha: "12/05/2026",
-        },
-        {
-          id: "2",
-          categoria: "Comunicación y feedback",
-          estado: "Aprobado",
-          fecha: "10/05/2026",
-        },
-      ];
+  useEffect(() => {
+    const fetchRequests = async () => {
+      try {
+        const token =
+          localStorage.getItem("token");
+
+        if (!token) {
+          return;
+        }
+
+        const data =
+          await getMyTrainingRequests(token);
+
+        setSolicitudes(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequests();
+
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <ProtectedRoute>
@@ -38,70 +74,99 @@ export default function MisSolicitudesView() {
             Mis solicitudes
           </h1>
 
-          <div className="space-y-6">
+          {loading ? (
+            <p className="text-gray-400">
+              Cargando solicitudes...
+            </p>
+          ) : solicitudes.length === 0 ? (
+            <div className="border border-white/10 rounded-xl bg-white/5 p-10 text-center">
+              <p className="text-gray-400">
+                Todavía no realizaste
+                ninguna solicitud.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
 
-            {solicitudes.map((sol: any) => {
+              {solicitudes.map((sol) => {
+                const estadoVisual =
+                  sol.status === "confirmed"
+                    ? "Confirmado"
+                    : sol.status ===
+                      "cancelled"
+                    ? "Cancelado"
+                    : sol.status ===
+                      "scheduled"
+                    ? "Agendado"
+                    : sol.status ===
+                      "in_review"
+                    ? "En revisión"
+                    : sol.status ===
+                      "awaiting_payment"
+                    ? "Esperando pago"
+                    : "Pendiente";
 
-              const agendaGuardada =
-                typeof window !== "undefined"
-                  ? localStorage.getItem(`agenda-${sol.id}`)
-                  : null;
+                return (
+                  <div
+                    key={sol.id}
+                    className="border border-white/10 p-6 rounded-xl bg-white/5 flex flex-col md:flex-row md:items-center md:justify-between"
+                  >
+                    <div>
 
-              const estadoVisual =
-                sol.estado === "Pagado"
-                  ? "Pagado"
-                  : agendaGuardada
-                  ? "Agendado"
-                  : sol.estado;
+                      <h3 className="text-lg font-semibold">
+                        {sol.training.title}
+                      </h3>
 
-              return (
-                <div
-                  key={sol.id}
-                  className="border border-white/10 p-6 rounded-xl bg-white/5 flex flex-col md:flex-row md:items-center md:justify-between"
-                >
-                  <div>
+                      <p className="text-gray-400 text-sm">
+                        Fecha:{" "}
+                        {new Date(
+                          sol.createdAt,
+                        ).toLocaleDateString(
+                          "es-AR",
+                        )}
+                      </p>
 
-                    <h3 className="text-lg font-semibold">
-                      {sol.categoria}
-                    </h3>
+                    </div>
 
-                    <p className="text-gray-400 text-sm">
-                      Fecha: {sol.fecha}
-                    </p>
+                    <div className="mt-4 md:mt-0 flex items-center gap-4">
 
+                      <span
+                        className={`px-3 py-1 text-sm rounded-full ${
+                          estadoVisual ===
+                          "Pendiente"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : estadoVisual ===
+                                "Confirmado"
+                            ? "bg-green-500/20 text-green-400"
+                            : estadoVisual ===
+                                "Cancelado"
+                            ? "bg-red-500/20 text-red-400"
+                            : estadoVisual ===
+                                "Agendado"
+                            ? "bg-purple-500/20 text-purple-400"
+                            : estadoVisual ===
+                                "En revisión"
+                            ? "bg-blue-500/20 text-blue-400"
+                            : "bg-orange-500/20 text-orange-400"
+                        }`}
+                      >
+                        {estadoVisual}
+                      </span>
+
+                      <Link
+                        href={`/mis-solicitudes/${sol.id}`}
+                        className="text-sm text-[#C7962D] hover:underline"
+                      >
+                        Ver detalle
+                      </Link>
+
+                    </div>
                   </div>
+                );
+              })}
 
-                  <div className="mt-4 md:mt-0 flex items-center gap-4">
-
-                    <span
-                      className={`px-3 py-1 text-sm rounded-full ${
-                        estadoVisual === "Pendiente"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : estadoVisual === "Aprobado"
-                          ? "bg-blue-500/20 text-blue-400"
-                          : estadoVisual === "Agendado"
-                          ? "bg-purple-500/20 text-purple-400"
-                          : estadoVisual === "Pagado"
-                          ? "bg-green-500/20 text-green-400"
-                          : ""
-                      }`}
-                    >
-                      {estadoVisual}
-                    </span>
-
-                    <Link
-                      href={`/mis-solicitudes/${sol.id}`}
-                      className="text-sm text-[#C7962D] hover:underline"
-                    >
-                      Ver detalle
-                    </Link>
-
-                  </div>
-                </div>
-              );
-            })}
-
-          </div>
+            </div>
+          )}
 
         </div>
       </div>
