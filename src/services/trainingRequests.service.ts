@@ -64,7 +64,7 @@ export const updateTrainingRequest = async (
   },
   token: string,
 ) => {
-  return await api(`/training-requests/${id}`, {
+  return await api(`/training-requests/${id}/status`, {
     method: "PATCH",
 
     headers: {
