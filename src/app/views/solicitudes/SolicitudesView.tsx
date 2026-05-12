@@ -1,23 +1,33 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
+
 import { useEffect, useState } from "react";
+
+import { createTrainingRequest } from "@/services/trainingRequests.service";
 
 export default function SolicitudesView() {
   const searchParams = useSearchParams();
+
   const router = useRouter();
+
+  const [trainingId, setTrainingId] = useState("");
 
   const [form, setForm] = useState({
     categoria: "",
     personas: "",
     objetivo: "",
     contexto: "",
-    email: "",
-    empresa: "",
   });
 
   useEffect(() => {
-    const categoria = searchParams.get("categoria") || "";
+    const categoria =
+      searchParams.get("categoria") || "";
+
+    const trainingId =
+      searchParams.get("trainingId") || "";
+
+    setTrainingId(trainingId);
 
     setForm((prev) => ({
       ...prev,
@@ -25,35 +35,51 @@ export default function SolicitudesView() {
     }));
   }, [searchParams]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >,
+  ) => {
     setForm({
       ...form,
+
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
 
-    const nuevaSolicitud = {
-      id: Date.now().toString(),
-      categoria: form.categoria,
-      estado: "Aprobado",
-      fecha: new Date().toLocaleDateString(),
-      personas: form.personas,
-      objetivo: form.objetivo,
-      contexto: form.contexto,
-    };
+    try {
+      const token =
+        localStorage.getItem("token");
 
-    const stored = localStorage.getItem("solicitudes");
-    const solicitudes = stored ? JSON.parse(stored) : [];
+      if (!token) {
+        return;
+      }
 
-    localStorage.setItem(
-      "solicitudes",
-      JSON.stringify([nuevaSolicitud, ...solicitudes])
-    );
+      await createTrainingRequest(
+        {
+          trainingId,
 
-    router.push("/mis-solicitudes");
+          participantsCount: Number(
+            form.personas,
+          ),
+
+          objectives: form.objetivo,
+
+          context: form.contexto,
+        },
+
+        token,
+      );
+
+      router.push("/mis-solicitudes");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -65,13 +91,21 @@ export default function SolicitudesView() {
         </h1>
 
         <p className="text-gray-400 mb-10">
-          Completá el formulario y te contactaremos para diseñar una propuesta a medida.
+          Completá el formulario y te
+          contactaremos para diseñar una
+          propuesta a medida.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
 
           <div>
-            <label className="text-sm text-gray-300">Tipo de capacitación</label>
+            <label className="text-sm text-gray-300">
+              Tipo de capacitación
+            </label>
+
             <input
               name="categoria"
               value={form.categoria}
@@ -81,9 +115,14 @@ export default function SolicitudesView() {
           </div>
 
           <div>
-            <label className="text-sm text-gray-300">Cantidad de personas</label>
+            <label className="text-sm text-gray-300">
+              Cantidad de personas
+            </label>
+
             <input
               name="personas"
+              type="number"
+              min={1}
               onChange={handleChange}
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
               required
@@ -91,9 +130,13 @@ export default function SolicitudesView() {
           </div>
 
           <div>
-            <label className="text-sm text-gray-300">Objetivo</label>
+            <label className="text-sm text-gray-300">
+              Objetivo
+            </label>
+
             <input
               name="objetivo"
+              minLength={20}
               onChange={handleChange}
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
               required
@@ -101,31 +144,16 @@ export default function SolicitudesView() {
           </div>
 
           <div>
-            <label className="text-sm text-gray-300">Contexto</label>
+            <label className="text-sm text-gray-300">
+              Contexto
+            </label>
+
             <textarea
               name="contexto"
+              minLength={30}
               onChange={handleChange}
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
               required
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-300">Email</label>
-            <input
-              name="email"
-              onChange={handleChange}
-              className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="text-sm text-gray-300">Empresa (opcional)</label>
-            <input
-              name="empresa"
-              onChange={handleChange}
-              className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
             />
           </div>
 
