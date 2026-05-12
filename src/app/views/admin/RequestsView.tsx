@@ -71,10 +71,8 @@ export default function RequestsView() {
 
         if (!token) return;
 
-        const data =
-          await getTrainingRequests(token);
-
-        setRequests(data);
+        const response = await getTrainingRequests(token);
+        setRequests(response.data); 
       } catch (error) {
         console.error(
           "Error obteniendo solicitudes",
@@ -219,6 +217,7 @@ export default function RequestsView() {
 
                     <select
                       value={req.status}
+                      disabled={req.status === "scheduled" || req.status === "cancelled"}
                       onChange={(e) =>
                         handleStatusChange(
                           req.id,
@@ -228,11 +227,13 @@ export default function RequestsView() {
                       }
                       className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300"
                     >
-                      <option value="pending">
+                      <option value="pending" 
+                      disabled={req.status !== "pending"}>
                         Pendiente
                       </option>
 
-                      <option value="scheduled">
+                      <option value="scheduled" 
+                      disabled={req.status !== "confirmed" && req.status !== "scheduled"}>
                         Agendada
                       </option>
 
