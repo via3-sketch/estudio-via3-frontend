@@ -98,21 +98,21 @@ export default function LoginForm({
 
       toast.success("Login exitoso");
 
-      // Completar perfil primero
-      if (!decoded.profileCompleted) {
-        router.push("/completar-perfil");
-
-        return;
-      }
-
-      // Redirect admin
+      // Redirect admin primero
       if (decoded.role === "admin") {
         router.push("/admin");
 
         return;
       }
 
-      // Usuario común
+      // Usuarios comunes completan perfil
+      if (!decoded.profileCompleted) {
+        router.push("/completar-perfil");
+
+        return;
+      }
+
+      // Usuario común normal
       router.push("/");
 
     } catch (err: any) {
