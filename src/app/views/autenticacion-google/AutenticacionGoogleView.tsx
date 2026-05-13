@@ -62,7 +62,9 @@ export default function AutenticacionGoogleView() {
           "Error al autenticar con Google",
         );
 
-        router.push("/login");
+        router.push(
+          "/autenticacion",
+        );
 
         return;
       }
@@ -100,7 +102,9 @@ export default function AutenticacionGoogleView() {
         "Error al autenticar con Google",
       );
 
-      router.push("/login");
+      router.push(
+        "/autenticacion",
+      );
     }
   }, [
     mounted,
