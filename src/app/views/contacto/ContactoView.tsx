@@ -97,7 +97,7 @@ export default function ContactoView() {
             className="w-full p-3 bg-white/5 border border-white/10 rounded"
           />
 
-          <button className="w-full py-3 bg-[#C7962D] text-black font-semibold rounded hover:opacity-90 transition">
+          <button className="cursor-pointer w-full py-3 bg-[#C7962D] text-black font-semibold rounded hover:opacity-90 transition">
             Enviar mensaje
           </button>
 

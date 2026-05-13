@@ -203,7 +203,7 @@ export default function Navbar() {
 
                   setOpen(false);
                 }}
-                className="mt-2 px-5 py-3 rounded-md text-center font-semibold border border-[#C7962D] text-[#C7962D]"
+                className="mt-2 px-5 py-3 rounded-md text-center font-semibold border border-[#C7962D] text-[#C7962D] hover:bg-[#C7962D] hover:text-black cursor-pointer"
               >
                 Cerrar sesión
               </button>

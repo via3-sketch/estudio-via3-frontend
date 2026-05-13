@@ -1,21 +1,23 @@
 "use client";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
-type ButtonProps = {
-  children: React.ReactNode;
-  onClick?: () => void;
-  type?: "button" | "submit";
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  children: ReactNode;
 };
 
 export default function Button({
+  className = "",
   children,
   onClick,
   type = "button",
+  ...props
 }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
-      className="
+      {...props}
+      className={`
         inline-flex
         items-center
         justify-center
@@ -38,7 +40,9 @@ export default function Button({
         hover:shadow-lg hover:shadow-[#C7962D]/20
 
         active:scale-[0.98]
-      "
+
+        ${className}
+      `}
     >
       {children}
     </button>
