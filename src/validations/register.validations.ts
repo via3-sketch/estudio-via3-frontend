@@ -5,7 +5,8 @@ export const registerSchema = z
     name: z
       .string()
       .min(1, "El nombre es obligatorio")
-      .max(12, "El nombre no puede tener más de 12 caracteres"),
+      .min(2, "El nombre debe tener 2 caracteres como mínimo")
+      .max(50, "El nombre no puede tener más de 50 caracteres"),
 
     email: z
       .string()
@@ -47,21 +48,27 @@ export const registerSchema = z
        
     country: z
       .string()
-      .min(1, "El país es obligatorio"),
+      .min(1, "El país es obligatorio")
+      .min(2, "El país debe tener mínimo 2 caracteres")
+      .max(50, "El país debe tener máximo 50 caracteres"),
 
       address: z
       .string()
-      .min(5, "La dirección debe tener al menos 5 caracteres")
+      .min(1, "La dirección es obligatoria")
+      .min(2, "La dirección debe tener al menos 2 caracteres")
       .max(50, "La dirección no puede tener más de 50 caracteres"),
 
     city: z
       .string()
-      .min(3, "La ciudad debe tener al menos 3 caracteres")
-      .max(20, "La ciudad no puede tener más de 20 caracteres"),
+      .min(1, "La ciudad es obligatoria")
+      .min(2, "La ciudad debe tener al menos 2 caracteres")
+      .max(50, "La ciudad no puede tener más de 50 caracteres"),
 
     companyName: z
       .string()
-      .min(1, "La empresa es obligatoria"),
+      .min(1, "La empresa es obligatoria")
+      .min(2, "La empresa debe tener al menos 2 caracteres")
+      .max(50, "La empresa no puede tener más de 50 caracteres"),
   })
 
   .refine((data) => data.password === data.confirmPassword, {

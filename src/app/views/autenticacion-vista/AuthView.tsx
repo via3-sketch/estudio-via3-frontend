@@ -10,7 +10,7 @@ export default function AuthView() {
     useState(true);
 
   return (
-    <main className="min-h-screen bg-[#070707] px-6 py-10 text-white">
+    <main className="min-h-screen bg-[#070707] px-2 sm:px-4 lg:px-6 py-4 sm:py-8 lg:py-10 text-white">
       <section className="mx-auto flex min-h-205 max-w-7xl overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0d0f] shadow-2xl">
 
         <aside className="hidden w-[32%] flex-col justify-between border-r border-white/10 bg-black/80 p-10 lg:flex">
@@ -53,7 +53,8 @@ export default function AuthView() {
           </div>
         </aside>
 
-        <section className="flex w-full items-center justify-center p-8 lg:w-[68%]">
+        <section className="flex w-full items-center justify-center p-3 sm:p-6 lg:w-[68%] lg:p-8"
+>
           <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/3 backdrop-blur-sm">
 
             <div className="grid grid-cols-2 border-b border-white/10">
@@ -86,9 +87,10 @@ export default function AuthView() {
 
             </div>
 
-            <div className="p-10">
+            <div className="p-5 sm:p-8 lg:p-10">
 
-              <div className="border-r border-white/10 pr-10">
+              <div className="w-full lg:border-r border-white/10 lg:pr-10"
+               >
 
                 <h2 className="mb-2 text-lg font-semibold">
                   {isLogin

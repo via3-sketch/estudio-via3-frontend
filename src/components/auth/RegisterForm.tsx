@@ -391,7 +391,7 @@ export default function RegisterForm({
 
       </div>
 
-      <Button type="submit">
+      <Button type="submit" className="w-full">
         Crear cuenta
       </Button>
 
