@@ -1,63 +1,151 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 
-import { getMeetings, cancelMeeting } from "@/services/meetings.service";
+import {
+  cancelMeeting,
+  getMeetings,
+} from "@/services/meetings.service";
 
 type Meeting = {
   id: string;
+
   date: string;
+
   time: string;
+
   status: string;
+
   link: string;
+
+  trainingRequest?: {
+    id: string;
+
+    status?: string;
+
+    training?: {
+      title?: string;
+    };
+  };
+
   user?: {
     name?: string;
+
     email?: string;
+
     companyName?: string;
   };
 };
 
 export default function AdminMeetingsView() {
-  const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [meetings, setMeetings] =
+    useState<Meeting[]>([]);
 
-  const fetchMeetings = async () => {
-    try {
-      const token = localStorage.getItem("token");
+  const [loading, setLoading] =
+    useState(true);
 
-      if (!token) return;
+  const fetchMeetings =
+    async () => {
+      try {
+        const token =
+          localStorage.getItem(
+            "token",
+          );
 
-      const data = await getMeetings(token);
+        if (!token) return;
 
-      setMeetings(data);
-    } catch (error) {
-      console.error("Error obteniendo reuniones", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const data =
+          await getMeetings(
+            token,
+          );
 
-  const handleCancel = async (id: string) => {
-    try {
-      const token = localStorage.getItem("token");
+        setMeetings(data);
+      } catch (error) {
+        console.error(
+          "Error obteniendo reuniones",
+          error,
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      if (!token) return;
+  const handleCancel =
+    async (id: string) => {
+      try {
+        const token =
+          localStorage.getItem(
+            "token",
+          );
 
-      await cancelMeeting(id, token);
+        if (!token) return;
 
-      fetchMeetings();
-    } catch (error) {
-      console.error("Error cancelando reunión", error);
-    }
-  };
+        await cancelMeeting(
+          id,
+          token,
+        );
+
+        fetchMeetings();
+      } catch (error) {
+        console.error(
+          "Error cancelando reunión",
+          error,
+        );
+      }
+    };
 
   useEffect(() => {
     fetchMeetings();
   }, []);
 
+  const getStatusStyles = (
+    status: string,
+  ) => {
+    switch (status) {
+      case "PENDING":
+        return "bg-yellow-500/10 text-yellow-400";
+
+      case "SCHEDULED":
+        return "bg-purple-500/10 text-purple-400";
+
+      case "CONFIRMED":
+        return "bg-green-500/10 text-green-400";
+
+      case "CANCELLED":
+        return "bg-red-500/10 text-red-400";
+
+      default:
+        return "bg-white/10 text-gray-300";
+    }
+  };
+
+  const getStatusLabel = (
+    status: string,
+  ) => {
+    switch (status) {
+      case "PENDING":
+        return "Pendiente";
+
+      case "SCHEDULED":
+        return "Agendada";
+
+      case "CONFIRMED":
+        return "Confirmada";
+
+      case "CANCELLED":
+        return "Cancelada";
+
+      default:
+        return status;
+    }
+  };
+
   if (loading) {
     return (
-      <div className="text-gray-400">
+      <div className="rounded-2xl border border-white/10 bg-[#0B0D0F] p-6 text-gray-400">
         Cargando reuniones...
       </div>
     );
@@ -67,94 +155,151 @@ export default function AdminMeetingsView() {
     <div className="space-y-6">
 
       <div>
+
         <h1 className="text-3xl font-semibold text-white">
           Reuniones
         </h1>
 
-        <p className="mt-2 text-sm text-gray-400">
+        <div className="h-0.5 w-14 bg-[#C7962D] mt-3" />
+
+        <p className="mt-3 text-sm text-gray-400">
           Gestión administrativa de reuniones corporativas.
         </p>
+
       </div>
 
       {meetings.length === 0 ? (
-        <div className="rounded-xl border border-white/10 bg-white/5 p-6 text-gray-400">
+
+        <div className="rounded-2xl border border-white/10 bg-[#0B0D0F] p-10 text-center text-gray-400">
           No hay reuniones registradas.
         </div>
+
       ) : (
-        <div className="grid gap-4">
 
-          {meetings.map((meeting) => (
-            <div
-              key={meeting.id}
-              className="rounded-xl border border-white/10 bg-white/5 p-5"
-            >
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="grid gap-5">
 
-                <div className="space-y-2">
+          {meetings.map(
+            (meeting) => (
+              <div
+                key={meeting.id}
+                className="rounded-2xl border border-white/10 bg-[#0B0D0F] p-6"
+              >
 
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-400">
-                      Estado:
-                    </span>
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-medium ${
-                        meeting.status === "Pendiente"
-                          ? "bg-yellow-500/10 text-yellow-400"
-                          : meeting.status === "Cancelada"
-                          ? "bg-red-500/10 text-red-400"
-                          : "bg-green-500/10 text-green-400"
-                      }`}
-                    >
-                      {meeting.status}
-                    </span>
+                  <div className="space-y-4">
+
+                    <div className="flex items-center gap-2">
+
+                      <span className="text-sm text-gray-400">
+                        Estado:
+                      </span>
+
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusStyles(
+                          meeting.status,
+                        )}`}
+                      >
+                        {getStatusLabel(
+                          meeting.status,
+                        )}
+                      </span>
+
+                    </div>
+
+                    <div>
+
+                      <h2 className="text-2xl font-semibold text-white">
+                        {meeting.user
+                          ?.companyName ||
+                          "Empresa"}
+                      </h2>
+
+                      <p className="mt-1 text-sm text-gray-400">
+                        {
+                          meeting.user
+                            ?.email
+                        }
+                      </p>
+
+                    </div>
+
+                    {meeting
+                      .trainingRequest
+                      ?.training
+                      ?.title && (
+                      <div>
+
+                        <p className="text-sm text-gray-400">
+                          Capacitación
+                        </p>
+
+                        <p className="text-base text-white mt-1">
+                          {
+                            meeting
+                              .trainingRequest
+                              .training
+                              .title
+                          }
+                        </p>
+
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-300">
+
+                      <span>
+                        📅{" "}
+                        {meeting.date}
+                      </span>
+
+                      <span>
+                        🕒{" "}
+                        {meeting.time}
+                      </span>
+
+                    </div>
+
                   </div>
 
-                  <h2 className="text-xl font-semibold text-white">
-                    {meeting.user?.companyName || "Empresa"}
-                  </h2>
+                  <div className="flex flex-wrap gap-3">
 
-                  <p className="text-sm text-gray-400">
-                    {meeting.user?.email}
-                  </p>
-
-                  <div className="flex flex-wrap gap-4 pt-2 text-sm text-gray-300">
-                    <span>
-                      📅 {meeting.date}
-                    </span>
-
-                    <span>
-                      🕒 {meeting.time}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-
-                  <a
-                    href={meeting.link}
-                    target="_blank"
-                    className="rounded-lg border border-[#C7962D]/30 px-4 py-2 text-sm text-[#C7962D] transition hover:bg-[#C7962D]/10"
-                  >
-                    Entrar
-                  </a>
-
-                  {meeting.status !== "Cancelada" && (
-                    <button
-                      onClick={() => handleCancel(meeting.id)}
-                      className="rounded-lg border border-red-500/30 px-4 py-2 text-sm text-red-400 transition hover:bg-red-500/10"
+                    <a
+                      href={
+                        meeting.link
+                      }
+                      target="_blank"
+                      className="rounded-xl border border-[#C7962D]/30 px-5 py-3 text-sm font-medium text-[#C7962D] transition hover:bg-[#C7962D]/10"
                     >
-                      Cancelar
-                    </button>
-                  )}
+                      Entrar a Meet
+                    </a>
+
+                    {meeting.status !==
+                      "CANCELLED" && (
+                      <button
+                        onClick={() =>
+                          handleCancel(
+                            meeting.id,
+                          )
+                        }
+                        className="rounded-xl border border-red-500/30 px-5 py-3 text-sm font-medium text-red-400 transition hover:bg-red-500/10"
+                      >
+                        Cancelar
+                      </button>
+                    )}
+
+                  </div>
 
                 </div>
+
               </div>
-            </div>
-          ))}
+            ),
+          )}
 
         </div>
+
       )}
+
     </div>
   );
 }

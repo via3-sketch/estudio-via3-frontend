@@ -1,9 +1,21 @@
 import { api } from "./api";
 
 export const getTrainingRequests = async (
-  token: string
+  token: string,
 ) => {
   return await api("/training-requests", {
+    method: "GET",
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const getMyTrainingRequests = async (
+  token: string,
+) => {
+  return await api("/training-requests/me", {
     method: "GET",
 
     headers: {
@@ -25,6 +37,26 @@ export const getTrainingRequestById = async (
   });
 };
 
+export const createTrainingRequest = async (
+  payload: {
+    trainingId: string;
+    participantsCount: number;
+    objectives: string;
+    context: string;
+  },
+  token: string,
+) => {
+  return await api("/training-requests", {
+    method: "POST",
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+
+    body: JSON.stringify(payload),
+  });
+};
+
 export const updateTrainingRequest = async (
   id: string,
   payload: {
@@ -32,7 +64,7 @@ export const updateTrainingRequest = async (
   },
   token: string,
 ) => {
-  return await api(`/training-requests/${id}`, {
+  return await api(`/training-requests/${id}/status`, {
     method: "PATCH",
 
     headers: {
