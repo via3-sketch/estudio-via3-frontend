@@ -89,63 +89,39 @@ export function UserProvider({
 
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
+  if (!user?.id) return;
 
-    if (!user?.id) return;
+  socket.connect();
+  socket.emit("join", user.id);
 
-    socket.connect();
-
-    socket.emit(
-      "join",
-      user.id,
-    );
-
-    socket.on(
-      "notification:new",
-      (notification) => {
-
-        toast.success(
-          notification.message ||
-          "Nueva notificación",
-        );
-      },
-    );
-
-    return () => {
-
-      socket.off(
-        "notification:new",
-      );
-    };
-
-  }, [user]);
-
-  const login = (
-    newToken: string,
-  ) => {
-
-    localStorage.setItem(
-      "token",
-      newToken,
-    );
-
-      setToken(newToken);
-
-    const decoded =
-      jwtDecode<DecodedToken>(
-        newToken,
-      );
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(decoded),
-    );
-
-      setUser(decoded);
-    } catch {
-      toast.error("Token inválido");
-    }
+  const handler = (notification: any) => {
+    toast.success(notification.message || "Nueva notificación");
   };
+
+  socket.on("notification:new", handler);
+
+  return () => {
+    socket.off("notification:new", handler);
+    socket.disconnect();
+  };
+}, [user?.id]);
+
+const login = (newToken: string) => {
+  try {
+    localStorage.setItem("token", newToken);
+
+    setToken(newToken);
+
+    const decoded = jwtDecode<DecodedToken>(newToken);
+
+    localStorage.setItem("user", JSON.stringify(decoded));
+
+    setUser(decoded);
+  } catch (error) {
+    toast.error("Token inválido");
+  }
+};
 
   const logout = () => {
 
