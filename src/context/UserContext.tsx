@@ -129,7 +129,7 @@ export function UserProvider({
       newToken,
     );
 
-      setToken(newToken);
+    setToken(newToken);
 
     const decoded =
       jwtDecode<DecodedToken>(
@@ -141,10 +141,7 @@ export function UserProvider({
       JSON.stringify(decoded),
     );
 
-      setUser(decoded);
-    } catch (_e) {
-      toast.error("Token inválido");
-    }
+    setUser(decoded);
   };
 
   const logout = () => {
