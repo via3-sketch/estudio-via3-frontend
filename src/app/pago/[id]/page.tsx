@@ -1,9 +1,11 @@
 import PagoView from "@/app/views/pago/PagoView";
 
-export default function Page({
+export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  return <PagoView id={params.id} />;
+  const { id } = await params;
+  return <PagoView id={id} />;
 }
+
