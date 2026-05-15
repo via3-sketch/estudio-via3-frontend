@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import {
-  updateTrainingRequest,
+  editTrainingRequest,
   getTrainingRequestById,
 } from "@/services/trainingRequests.service";
 
