@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -128,7 +129,7 @@ export function UserProvider({
       newToken,
     );
 
-    setToken(newToken);
+      setToken(newToken);
 
     const decoded =
       jwtDecode<DecodedToken>(
@@ -140,7 +141,10 @@ export function UserProvider({
       JSON.stringify(decoded),
     );
 
-    setUser(decoded);
+      setUser(decoded);
+    } catch {
+      toast.error("Token inválido");
+    }
   };
 
   const logout = () => {

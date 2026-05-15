@@ -43,7 +43,7 @@ type LoginFormProps = {
 
 export default function LoginForm({
   onSwitchToRegister,
-}: LoginFormProps) { 
+}: LoginFormProps) {
   const router = useRouter();
 
   const { login } = useUser();
@@ -89,21 +89,30 @@ export default function LoginForm({
         await loginUser(result.data);
 
       const token =
-         data.access_token;
+        data.access_token;
 
       const decoded =
-      jwtDecode<DecodedToken>(token);
+        jwtDecode<DecodedToken>(token);
 
       login(token);
 
       toast.success("Login exitoso");
 
-     if (!decoded.profileCompleted) {
-      router.push("/completar-perfil");
+      // Redirect admin primero
+      if (decoded.role === "admin") {
+        router.push("/admin");
 
-      return;
-    }
+        return;
+      }
 
+      // Usuarios comunes completan perfil
+      if (!decoded.profileCompleted) {
+        router.push("/completar-perfil");
+
+        return;
+      }
+
+      // Usuario común normal
       router.push("/");
 
     } catch (err: any) {
