@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
 import {
   Eye,
@@ -24,18 +22,6 @@ import { loginSchema } from "@/validations/login.validations";
 import { useUser } from "@/hooks/useUser";
 
 import { toast } from "sonner";
-
-import { jwtDecode } from "jwt-decode";
-
-type DecodedToken = {
-  id: string;
-
-  email: string;
-
-  role: string;
-
-  profileCompleted: boolean;
-};
 
 type LoginFormProps = {
   onSwitchToRegister: () => void;
@@ -91,28 +77,10 @@ export default function LoginForm({
       const token =
         data.access_token;
 
-      const decoded =
-        jwtDecode<DecodedToken>(token);
-
       login(token);
 
       toast.success("Login exitoso");
 
-      // Redirect admin primero
-      if (decoded.role === "admin") {
-        router.push("/admin");
-
-        return;
-      }
-
-      // Usuarios comunes completan perfil
-      if (!decoded.profileCompleted) {
-        router.push("/completar-perfil");
-
-        return;
-      }
-
-      // Usuario común normal
       router.push("/");
 
     } catch (err: any) {

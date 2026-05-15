@@ -16,12 +16,14 @@ import { toast } from "sonner";
 
 import { socket } from "@/lib/socket";
 
-type DecodedToken = {
+ export type DecodedToken = {
   id: string;
 
   email: string;
 
   role: string;
+
+  profileCompleted: boolean;
 };
 
 type UserContextType = {
@@ -30,6 +32,8 @@ type UserContextType = {
   user: DecodedToken | null;
 
   isAuthenticated: boolean;
+
+  isProfileCompleted: boolean;
 
   isHydrated: boolean;
 
@@ -111,6 +115,8 @@ const login = (newToken: string) => {
   try {
     localStorage.setItem("token", newToken);
 
+    document.cookie = `userSession=${newToken}; path=/; max-age=86400`;
+
     setToken(newToken);
 
     const decoded = jwtDecode<DecodedToken>(newToken);
@@ -133,6 +139,8 @@ const login = (newToken: string) => {
       "user",
     );
 
+    document.cookie = "userSession=; path=/; max-age=0";
+
     setToken(null);
 
     setUser(null);
@@ -154,6 +162,8 @@ const login = (newToken: string) => {
 
         isAuthenticated:
           !!token,
+
+        isProfileCompleted: !!user?.profileCompleted,
 
         isHydrated,
 

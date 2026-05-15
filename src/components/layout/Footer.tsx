@@ -42,7 +42,7 @@ export default function Footer() {
 
             <li>
               <a
-                href="#como-funciona"
+                href="/#como-funciona"
                 className="hover:text-white transition"
               >
                 Cómo funciona
