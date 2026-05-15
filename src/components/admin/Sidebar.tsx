@@ -33,7 +33,7 @@ export default function Sidebar() {
       <div className="space-y-4">
         <div className="border-t border-white/10 pt-4 space-y-2 text-sm">
           <Link
-            href="/"
+            href="https://estudio-via3-frontend.vercel.app"
             className="block px-3 py-2 rounded-md text-gray-300 hover:text-[#C7962D] hover:bg-white/5 transition"
           >
             ← Volver al sitio
