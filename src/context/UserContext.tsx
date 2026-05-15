@@ -14,9 +14,13 @@ import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
+import { socket } from "@/lib/socket";
+
 type DecodedToken = {
   id: string;
+
   email: string;
+
   role: string;
 };
 
@@ -34,15 +38,17 @@ type UserContextType = {
   logout: () => void;
 };
 
-const UserContext = createContext<
-  UserContextType | undefined
->(undefined);
+const UserContext =
+  createContext<
+    UserContextType | undefined
+  >(undefined);
 
 export function UserProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
   const [token, setToken] =
     useState<string | null>(null);
 
@@ -57,46 +63,83 @@ export function UserProvider({
     useState(false);
 
   useEffect(() => {
+
     const storedToken =
       localStorage.getItem("token");
 
     if (storedToken) {
-      try {
-        setToken(storedToken);
 
-        const decoded =
-          jwtDecode<DecodedToken>(
-            storedToken,
-          );
-
-        setUser(decoded);
-      } catch {
-        localStorage.removeItem(
-          "token",
-        );
-
-        setToken(null);
-
-        setUser(null);
-      }
-    }
-
-    setIsHydrated(true);
-  }, []);
-
-  const login = (newToken: string) => {
-    try {
-      localStorage.setItem(
-        "token",
-        newToken,
-      );
-
-      setToken(newToken);
+      setToken(storedToken);
 
       const decoded =
         jwtDecode<DecodedToken>(
-          newToken,
+          storedToken,
         );
+
+      setUser(decoded);
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(decoded),
+      );
+
+    }
+
+    setIsHydrated(true);
+
+  }, []);
+
+  useEffect(() => {
+
+    if (!user?.id) return;
+
+    socket.connect();
+
+    socket.emit(
+      "join",
+      user.id,
+    );
+
+    socket.on(
+      "notification:new",
+      (notification) => {
+
+        toast.success(
+          notification.message ||
+          "Nueva notificación",
+        );
+      },
+    );
+
+    return () => {
+
+      socket.off(
+        "notification:new",
+      );
+    };
+
+  }, [user]);
+
+  const login = (
+    newToken: string,
+  ) => {
+
+    localStorage.setItem(
+      "token",
+      newToken,
+    );
+
+      setToken(newToken);
+
+    const decoded =
+      jwtDecode<DecodedToken>(
+        newToken,
+      );
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(decoded),
+    );
 
       setUser(decoded);
     } catch {
@@ -105,7 +148,14 @@ export function UserProvider({
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+
+    localStorage.removeItem(
+      "token",
+    );
+
+    localStorage.removeItem(
+      "user",
+    );
 
     setToken(null);
 
@@ -121,11 +171,13 @@ export function UserProvider({
   return (
     <UserContext.Provider
       value={{
+
         token,
 
         user,
 
-        isAuthenticated: !!token,
+        isAuthenticated:
+          !!token,
 
         isHydrated,
 
@@ -140,13 +192,16 @@ export function UserProvider({
 }
 
 export function useUserContext() {
+
   const context =
     useContext(UserContext);
 
   if (!context) {
+
     throw new Error(
       "useUserContext debe usarse dentro de UserProvider",
     );
+
   }
 
   return context;

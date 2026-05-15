@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import {
   useEffect,
   useState,
@@ -13,6 +15,14 @@ import { getTrainingRequests } from "@/services/trainingRequests.service";
 
 import { getAllTrainings } from "@/services/training.service";
 
+type Training = {
+  id: string;
+
+  title: string;
+
+  shortDescription: string;
+};
+
 export default function AdminView() {
   const [loading, setLoading] =
     useState(true);
@@ -25,6 +35,9 @@ export default function AdminView() {
 
       trainings: 0,
     });
+
+  const [trainings, setTrainings] =
+    useState<Training[]>([]);
 
   useEffect(() => {
     const fetchDashboard =
@@ -40,7 +53,7 @@ export default function AdminView() {
           const [
             users,
             requests,
-            trainings,
+            trainingsData,
           ] = await Promise.all([
             getUsers(token),
 
@@ -58,8 +71,12 @@ export default function AdminView() {
               requests.length,
 
             trainings:
-              trainings.length,
+              trainingsData.length,
           });
+
+          setTrainings(
+            trainingsData,
+          );
         } catch (error) {
           console.error(
             "Error cargando dashboard",
@@ -85,11 +102,8 @@ export default function AdminView() {
 
   return (
     <AdminLayout>
-
       <div className="space-y-8">
-
         <div>
-
           <h1 className="text-3xl font-semibold text-white">
             Dashboard
           </h1>
@@ -99,13 +113,10 @@ export default function AdminView() {
           <p className="text-gray-400 mt-4">
             Panel de administración de la plataforma.
           </p>
-
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-
           <div className="p-6 rounded-2xl bg-[#0B0D0F] border border-white/10 shadow-lg">
-
             <p className="text-gray-400 text-sm">
               Usuarios
             </p>
@@ -113,11 +124,9 @@ export default function AdminView() {
             <p className="text-3xl font-semibold text-white mt-2">
               {stats.users}
             </p>
-
           </div>
 
           <div className="p-6 rounded-2xl bg-[#0B0D0F] border border-white/10 shadow-lg">
-
             <p className="text-gray-400 text-sm">
               Solicitudes
             </p>
@@ -125,11 +134,9 @@ export default function AdminView() {
             <p className="text-3xl font-semibold text-white mt-2">
               {stats.requests}
             </p>
-
           </div>
 
           <div className="p-6 rounded-2xl bg-[#0B0D0F] border border-white/10 shadow-lg">
-
             <p className="text-gray-400 text-sm">
               Capacitaciones
             </p>
@@ -137,13 +144,57 @@ export default function AdminView() {
             <p className="text-3xl font-semibold text-white mt-2">
               {stats.trainings}
             </p>
-
           </div>
-
         </div>
 
-      </div>
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold text-white">
+              Gestionar capacitaciones
+            </h2>
 
+            <p className="text-gray-400 mt-2">
+              Editá o eliminá las capacitaciones disponibles.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {trainings.map(
+              (training) => (
+                <div
+                  key={training.id}
+                  className="rounded-2xl border border-white/10 bg-[#0B0D0F] p-6"
+                >
+                  <h3 className="text-lg font-semibold text-white">
+                    {
+                      training.title
+                    }
+                  </h3>
+
+                  <p className="mt-3 text-sm text-gray-400">
+                    {
+                      training.shortDescription
+                    }
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-4">
+                    <Link
+                      href={`/admin/services/${training.id}/edit`}
+                      className="text-sm text-[#C7962D] hover:underline"
+                    >
+                      Editar
+                    </Link>
+
+                    <button className="text-sm text-red-400 hover:underline">
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+      </div>
     </AdminLayout>
   );
 }

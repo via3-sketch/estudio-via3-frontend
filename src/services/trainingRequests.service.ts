@@ -57,6 +57,26 @@ export const createTrainingRequest = async (
   });
 };
 
+export const editTrainingRequest = async (
+  id: string,
+  payload: {
+    participantsCount: number;
+    objectives: string;
+    context: string;
+  },
+  token: string,
+) => {
+  return await api(`/training-requests/${id}`, {
+    method: "PATCH",
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+
+    body: JSON.stringify(payload),
+  });
+};
+
 export const updateTrainingRequest = async (
   id: string,
   payload: {
