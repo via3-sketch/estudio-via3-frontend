@@ -142,7 +142,7 @@ export function UserProvider({
     );
 
       setUser(decoded);
-    } catch {
+    } catch (_e) {
       toast.error("Token inválido");
     }
   };
