@@ -79,7 +79,7 @@ export default function EditServiceView({
           );
 
           setShortDescription(
-            data.description ||
+            data.shortDescription ||
               "",
           );
 
