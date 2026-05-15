@@ -5,6 +5,8 @@ import {
   useState,
 } from "react";
 
+import { toast } from "sonner";
+
 import AdminLayout from "@/components/admin/AdminLayout";
 
 import Link from "next/link";
@@ -71,8 +73,12 @@ export default function RequestsView() {
 
         if (!token) return;
 
-        const response = await getTrainingRequests(token);
-        setRequests(response.data); 
+        const response =
+          await getTrainingRequests(
+            token,
+          );
+
+        setRequests(response.data);
       } catch (error) {
         console.error(
           "Error obteniendo solicitudes",
@@ -114,10 +120,18 @@ export default function RequestsView() {
             : req,
         ),
       );
+
+      toast.success(
+        "Estado actualizado correctamente",
+      );
     } catch (error) {
       console.error(
         "Error actualizando estado",
         error,
+      );
+
+      toast.error(
+        "Error actualizando estado",
       );
     }
   };
@@ -135,7 +149,6 @@ export default function RequestsView() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-
         <div>
           <h1 className="text-2xl font-semibold text-white">
             Solicitudes
@@ -149,9 +162,7 @@ export default function RequestsView() {
         </div>
 
         <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5">
-
           <table className="w-full text-sm">
-
             <thead className="border-b border-white/10 text-gray-400">
               <tr>
                 <th className="p-4 text-left">
@@ -178,7 +189,6 @@ export default function RequestsView() {
                   key={req.id}
                   className="border-b border-white/5"
                 >
-
                   <td className="p-4">
                     {req.user?.companyName ||
                       "Empresa"}
@@ -189,7 +199,6 @@ export default function RequestsView() {
                   </td>
 
                   <td className="p-4 space-y-2">
-
                     <span
                       className={`text-xs px-2 py-1 rounded block w-fit ${
                         statusStyles[
@@ -217,7 +226,12 @@ export default function RequestsView() {
 
                     <select
                       value={req.status}
-                      disabled={req.status === "scheduled" || req.status === "cancelled"}
+                      disabled={
+                        req.status ===
+                          "scheduled" ||
+                        req.status ===
+                          "cancelled"
+                      }
                       onChange={(e) =>
                         handleStatusChange(
                           req.id,
@@ -227,13 +241,25 @@ export default function RequestsView() {
                       }
                       className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300"
                     >
-                      <option value="pending" 
-                      disabled={req.status !== "pending"}>
+                      <option
+                        value="pending"
+                        disabled={
+                          req.status !==
+                          "pending"
+                        }
+                      >
                         Pendiente
                       </option>
 
-                      <option value="scheduled" 
-                      disabled={req.status !== "confirmed" && req.status !== "scheduled"}>
+                      <option
+                        value="scheduled"
+                        disabled={
+                          req.status !==
+                            "confirmed" &&
+                          req.status !==
+                            "scheduled"
+                        }
+                      >
                         Agendada
                       </option>
 
@@ -253,7 +279,6 @@ export default function RequestsView() {
                         Cancelada
                       </option>
                     </select>
-
                   </td>
 
                   <td className="p-4 text-right">
@@ -265,15 +290,11 @@ export default function RequestsView() {
                       </button>
                     </Link>
                   </td>
-
                 </tr>
               ))}
             </tbody>
-
           </table>
-
         </div>
-
       </div>
     </AdminLayout>
   );
