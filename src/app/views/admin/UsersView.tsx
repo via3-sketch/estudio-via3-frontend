@@ -7,7 +7,12 @@ import {
 
 import AdminLayout from "@/components/admin/AdminLayout";
 
-import { getUsers } from "@/services/users.service";
+import {
+  getUsers,
+  deactivateUser,
+} from "@/services/users.service";
+
+import { toast } from "sonner";
 
 type User = {
   id: string;
@@ -28,30 +33,72 @@ export default function UsersView() {
   const [loading, setLoading] =
     useState(true);
 
+  const fetchUsers = async () => {
+    try {
+      const token =
+        localStorage.getItem("token");
+
+      if (!token) return;
+
+      const data =
+        await getUsers(token);
+
+      setUsers(data);
+    } catch (error) {
+      console.error(
+        "Error obteniendo usuarios",
+        error,
+      );
+
+      toast.error(
+        "Error obteniendo usuarios",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
+    fetchUsers();
+  }, []);
+
+  const handleDeactivate =
+    async (id: string) => {
       try {
         const token =
-          localStorage.getItem("token");
+          localStorage.getItem(
+            "token",
+          );
 
         if (!token) return;
 
-        const data =
-          await getUsers(token);
-
-        setUsers(data);
-      } catch (error) {
-        console.error(
-          "Error obteniendo usuarios",
-          error,
+        await deactivateUser(
+          id,
+          token,
         );
-      } finally {
-        setLoading(false);
+
+        toast.success(
+          "Usuario bloqueado correctamente",
+        );
+
+        setUsers((prev) =>
+          prev.map((user) =>
+            user.id === id
+              ? {
+                  ...user,
+                  isActive: false,
+                }
+              : user,
+          ),
+        );
+      } catch (error) {
+        console.error(error);
+
+        toast.error(
+          "Error bloqueando usuario",
+        );
       }
     };
-
-    fetchUsers();
-  }, []);
 
   if (loading) {
     return (
@@ -97,6 +144,10 @@ export default function UsersView() {
                 <th className="text-left p-4">
                   Estado
                 </th>
+
+                <th className="text-left p-4">
+                  Acción
+                </th>
               </tr>
             </thead>
 
@@ -136,6 +187,23 @@ export default function UsersView() {
                         ? "Activo"
                         : "Inactivo"}
                     </span>
+
+                  </td>
+
+                  <td className="p-4">
+
+                    {user.isActive && (
+                      <button
+                        onClick={() =>
+                          handleDeactivate(
+                            user.id,
+                          )
+                        }
+                        className="rounded-lg bg-red-500/10 px-3 py-2 text-xs font-medium text-red-400 transition hover:bg-red-500/20"
+                      >
+                        Bloquear
+                      </button>
+                    )}
 
                   </td>
 

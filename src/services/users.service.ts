@@ -11,3 +11,16 @@ export const getUsers = async (
     },
   });
 };
+
+export const deactivateUser = async (
+  id: string,
+  token: string,
+) => {
+  return await api(`/users/${id}`, {
+    method: "DELETE",
+
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
