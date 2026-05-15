@@ -190,7 +190,7 @@ export default function LoginForm({
 
       </div>
 
-      <Button type="submit">
+      <Button type="submit" className="w-full">
         Acceder
       </Button>
 

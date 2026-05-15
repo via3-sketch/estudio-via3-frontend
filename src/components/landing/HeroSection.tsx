@@ -30,7 +30,7 @@ export default function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4">
 
             <Link href="/plataforma">
-              <Button>
+              <Button className="w-full sm:w-auto">
                 Explorar capacitaciones
               </Button>
             </Link>

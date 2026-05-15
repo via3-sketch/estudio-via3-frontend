@@ -24,7 +24,6 @@ export default function ConfirmacionPagoView({ id }: ConfirmacionPagoViewProps) 
 
     localStorage.setItem("solicitudes", JSON.stringify(actualizadas));
 
-    // TODO: backend → confirmar pago real + webhook MercadoPago
   }, [id]);
 
   return (

@@ -24,16 +24,17 @@ export default function ProtectedRoute({
     user,
   } = useUser();
 
+  const isAdminRoute =
+      pathname.startsWith("/admin");
+
   useEffect(() => {
     if (
       isHydrated &&
       !isAuthenticated
     ) {
       router.push("/autenticacion");
+      return
     }
-
-    const isAdminRoute =
-      pathname.startsWith("/admin");
 
     if (
       isHydrated &&
@@ -55,6 +56,13 @@ export default function ProtectedRoute({
   }
 
   if (!isAuthenticated) {
+    return null;
+  }
+
+  if (
+    isAdminRoute &&
+    user?.role !== "Admin"
+  ) {
     return null;
   }
 
