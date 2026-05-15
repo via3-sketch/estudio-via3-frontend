@@ -385,7 +385,7 @@ export default function SolicitudDetalleView({
           >
             ← Volver
           </Link>
-        </div>
+        
       </div>
     </div>
   );
