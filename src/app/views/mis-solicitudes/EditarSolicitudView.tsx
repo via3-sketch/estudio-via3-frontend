@@ -38,7 +38,6 @@ type Solicitud = {
 export default function EditarSolicitudView({
   id,
 }: Props) {
-
   const router =
     useRouter();
 
@@ -65,12 +64,9 @@ export default function EditarSolicitudView({
     );
 
   useEffect(() => {
-
     const fetchSolicitud =
       async () => {
-
         try {
-
           const token =
             localStorage.getItem(
               "token",
@@ -97,9 +93,7 @@ export default function EditarSolicitudView({
           setContext(
             data.context,
           );
-
         } catch (error) {
-
           console.error(
             "Error obteniendo solicitud",
             error,
@@ -108,26 +102,20 @@ export default function EditarSolicitudView({
           toast.error(
             "Error cargando la solicitud",
           );
-
         } finally {
-
           setLoading(false);
-
         }
       };
 
     fetchSolicitud();
-
   }, [id]);
 
   const handleSubmit = async (
     e: SubmitEvent<HTMLFormElement>,
   ) => {
-
     e.preventDefault();
 
     try {
-
       setSaving(true);
 
       const token =
@@ -136,7 +124,6 @@ export default function EditarSolicitudView({
         );
 
       if (!token) {
-
         toast.warning(
           "Debes iniciar sesión",
         );
@@ -163,9 +150,7 @@ export default function EditarSolicitudView({
       router.push(
         `/mis-solicitudes/${id}`,
       );
-
     } catch (error) {
-
       console.error(
         "Error actualizando solicitud",
         error,
@@ -174,47 +159,35 @@ export default function EditarSolicitudView({
       toast.error(
         "Error actualizando solicitud",
       );
-
     } finally {
-
       setSaving(false);
-
     }
   };
 
   if (loading) {
-
     return (
       <div className="container mx-auto px-4 py-16">
-
         <div className="rounded-2xl border border-white/10 bg-[#0B0D0F] p-6 text-gray-400">
           Cargando solicitud...
         </div>
-
       </div>
     );
   }
 
   if (!solicitud) {
-
     return (
       <div className="container mx-auto px-4 py-16">
-
         <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-red-400">
           No se encontró la solicitud.
         </div>
-
       </div>
     );
   }
 
   return (
     <section className="min-h-screen bg-black px-4 py-16">
-
       <div className="mx-auto max-w-4xl space-y-8">
-
         <div>
-
           <h1 className="text-4xl font-semibold text-white">
             Editar solicitud
           </h1>
@@ -224,7 +197,6 @@ export default function EditarSolicitudView({
           <p className="mt-4 text-gray-400">
             Actualizá la información de tu solicitud.
           </p>
-
         </div>
 
         <form
@@ -233,12 +205,9 @@ export default function EditarSolicitudView({
           }
           className="space-y-6 rounded-2xl border border-white/10 bg-[#0B0D0F] p-8"
         >
-
           {solicitud.training
             ?.title && (
-
             <div>
-
               <p className="text-sm text-gray-400">
                 Capacitación
               </p>
@@ -250,13 +219,10 @@ export default function EditarSolicitudView({
                     .title
                 }
               </p>
-
             </div>
-
           )}
 
           <div className="space-y-2">
-
             <label className="text-sm text-gray-300">
               Participantes
             </label>
@@ -276,11 +242,9 @@ export default function EditarSolicitudView({
               }
               className="w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
             />
-
           </div>
 
           <div className="space-y-2">
-
             <label className="text-sm text-gray-300">
               Objetivos
             </label>
@@ -294,11 +258,9 @@ export default function EditarSolicitudView({
               }
               className="min-h-35 w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
             />
-
           </div>
 
           <div className="space-y-2">
-
             <label className="text-sm text-gray-300">
               Contexto organizacional
             </label>
@@ -312,7 +274,6 @@ export default function EditarSolicitudView({
               }
               className="min-h-35 w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
             />
-
           </div>
 
           <button
@@ -324,11 +285,8 @@ export default function EditarSolicitudView({
               ? "Guardando..."
               : "Guardar cambios"}
           </button>
-
         </form>
-
       </div>
-
     </section>
   );
 }
