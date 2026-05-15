@@ -1,7 +1,3 @@
-import {
-  obtenerContenidoNotificacion,
-} from "./notificaciones.utils";
-
 type Notification = {
   id: string;
 
@@ -26,12 +22,6 @@ export default function ItemNotificacion({
   notification,
   onRead,
 }: Props) {
-
-  const traducido =
-    obtenerContenidoNotificacion(
-      notification.type,
-    );
-
   return (
     <button
       onClick={onRead}
@@ -41,29 +31,19 @@ export default function ItemNotificacion({
           : "border-[#C7962D]/30 bg-[#C7962D]/10"
       }`}
     >
-
       <div className="flex items-center justify-between">
-
         <h4 className="text-sm font-medium text-white">
-
-          {traducido.titulo}
-
+          {notification.title}
         </h4>
 
         {!notification.isRead && (
-
           <div className="h-2 w-2 rounded-full bg-[#C7962D]" />
-
         )}
-
       </div>
 
       <p className="text-xs text-gray-400 mt-2">
-
-        {traducido.descripcion}
-
+        {notification.message}
       </p>
-
     </button>
   );
 }
