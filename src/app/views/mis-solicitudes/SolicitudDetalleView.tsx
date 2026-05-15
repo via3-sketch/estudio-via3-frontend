@@ -388,22 +388,22 @@ export default function SolicitudDetalleView({
             </div>
           )}
 
-        {tieneAgenda && (
-          <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
+     {solicitud.status === "scheduled" && (
+        <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
 
-            <span className="text-sm text-[#F4D27A]">
-              La reunión fue coordinada correctamente.
-            </span>
+        <span className="text-sm text-[#F4D27A]">
+          La reunión fue coordinada correctamente.
+       </span>
 
-            <Link
-              href={`/pago/${solicitud.id}`}
-              className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition"
-            >
-              Continuar al pago
-            </Link>
+       <Link
+         href={`/pago/${solicitud.id}`}
+         className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold"
+       >
+         Continuar al pago
+       </Link>
 
-          </div>
-        )}
+       </div>
+       )}
 
         <Link
           href="/mis-solicitudes"

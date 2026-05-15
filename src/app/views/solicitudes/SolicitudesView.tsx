@@ -159,7 +159,7 @@ export default function SolicitudesView() {
 
           <button
             type="submit"
-            className="w-full py-4 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition"
+            className="w-full py-4 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition cursor-pointer"
           >
             Enviar solicitud
           </button>

@@ -39,7 +39,7 @@ export default function ProtectedRoute({
     if (
       isHydrated &&
       isAdminRoute &&
-      user?.role !== "Admin"
+      user?.role !== "admin"
     ) {
       router.push("/");
     }
@@ -61,7 +61,7 @@ export default function ProtectedRoute({
 
   if (
     isAdminRoute &&
-    user?.role !== "Admin"
+    user?.role !== "admin"
   ) {
     return null;
   }
