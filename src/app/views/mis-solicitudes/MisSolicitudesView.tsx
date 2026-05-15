@@ -8,6 +8,8 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 import { getMyTrainingRequests } from "@/services/trainingRequests.service";
 
+import { socket } from "@/lib/socket";
+
 interface TrainingRequest {
   id: string;
 
@@ -27,41 +29,79 @@ interface TrainingRequest {
 }
 
 export default function MisSolicitudesView() {
-  const [solicitudes, setSolicitudes] = useState<
-    TrainingRequest[]
-  >([]);
+
+  const [solicitudes, setSolicitudes] =
+    useState<
+      TrainingRequest[]
+    >([]);
 
   const [loading, setLoading] =
     useState(true);
 
   useEffect(() => {
-    const fetchRequests = async () => {
-      try {
-        const token =
-          localStorage.getItem("token");
 
-        if (!token) {
-          return;
+    const fetchRequests =
+      async () => {
+        try {
+
+          const token =
+            localStorage.getItem(
+              "token",
+            );
+
+          if (!token) {
+            return;
+          }
+
+          const data =
+            await getMyTrainingRequests(
+              token,
+            );
+
+          setSolicitudes(data);
+
+        } catch (error) {
+
+          console.error(error);
+
+        } finally {
+
+          setLoading(false);
+
         }
-
-        const data =
-          await getMyTrainingRequests(token);
-
-        setSolicitudes(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
     fetchRequests();
 
-    const interval = setInterval(() => {
-      fetchRequests();
-    }, 5000);
+    socket.on(
+      "notification:new",
+      async () => {
 
-    return () => clearInterval(interval);
+        const token =
+          localStorage.getItem(
+            "token",
+          );
+
+        if (!token) return;
+
+        const updatedRequests =
+          await getMyTrainingRequests(
+            token,
+          );
+
+        setSolicitudes(
+          updatedRequests,
+        );
+      },
+    );
+
+    return () => {
+
+      socket.off(
+        "notification:new",
+      );
+    };
+
   }, []);
 
   return (
@@ -89,8 +129,10 @@ export default function MisSolicitudesView() {
             <div className="space-y-6">
 
               {solicitudes.map((sol) => {
+
                 const estadoVisual =
-                  sol.status === "confirmed"
+                  sol.status ===
+                  "confirmed"
                     ? "Confirmado"
                     : sol.status ===
                       "cancelled"
