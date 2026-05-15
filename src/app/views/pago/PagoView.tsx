@@ -11,25 +11,29 @@ export default function PagoView({ id }: PagoViewProps) {
   const [solicitud, setSolicitud] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("token");
+ useEffect(() => {
 
-        if (!token) return;
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-        const data = await getTrainingRequestById(id, token);
-
-        setSolicitud(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
+      if (!token) {
         setLoading(false);
+        return;
       }
-    };
 
-    fetchData();
-  }, [id]);
+      const data = await getTrainingRequestById(id, token);
+
+      setSolicitud(data);
+    } catch (err) {
+      console.error("ERROR:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchData();
+}, [id]);
 
   if (loading) {
     return <p className="text-white p-10">Cargando...</p>;
@@ -38,9 +42,6 @@ export default function PagoView({ id }: PagoViewProps) {
   if (!solicitud) {
     return <p className="text-white p-10">Solicitud no encontrada</p>;
   }
-
-  const precioPorPersona = 30000;
-  const total = Number(solicitud.participantsCount || 1) * precioPorPersona;
 
 const handlePago = async () => {
 const token = localStorage.getItem("token"); 
@@ -69,7 +70,7 @@ const token = localStorage.getItem("token");
         },
         body: JSON.stringify({
           trainingRequestId: solicitud.id,
-          userId: solicitud.userId,
+          userId: solicitud.user.id,
         }),
       }
     );
@@ -97,13 +98,12 @@ const token = localStorage.getItem("token");
         <div className="border border-white/10 p-6 rounded-xl bg-white/5 space-y-4">
           <p>Servicio: {solicitud.training.title}</p>
           <p>Participantes: {solicitud.participantsCount}</p>
-          <p>Precio por persona: $30.000 ARS</p>
         </div>
 
         <div className="mt-6 border border-white/10 p-6 rounded-xl bg-white/5 flex justify-between">
           <p>Total</p>
           <p className="text-[#C7962D] text-2xl font-semibold">
-            ${total.toLocaleString()} ARS
+            ${Number(solicitud.estimatedPrice).toLocaleString()} ARS
           </p>
         </div>
 
