@@ -4,8 +4,6 @@ import Link from "next/link";
 
 import { useEffect, useState } from "react";
 
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
-
 import { getMyTrainingRequests } from "@/services/trainingRequests.service";
 
 import { socket } from "@/lib/socket";
@@ -105,8 +103,6 @@ export default function MisSolicitudesView() {
   }, []);
 
   return (
-    <ProtectedRoute>
-
       <div className="bg-[#070707] text-white px-6 pt-32 pb-24 min-h-screen">
         <div className="mx-auto max-w-5xl">
 
@@ -212,7 +208,5 @@ export default function MisSolicitudesView() {
 
         </div>
       </div>
-
-    </ProtectedRoute>
   );
 }

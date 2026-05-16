@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import {toast} from "sonner";
+
 export default function ContactoView() {
   const [form, setForm] = useState({
     nombre: "",
@@ -37,9 +39,8 @@ export default function ContactoView() {
 
 
   
-    alert("Mensaje enviado correctamente");
+    toast.success("Mensaje enviado correctamente");
 
-    // 🔄 reset form
     setForm({
       nombre: "",
       email: "",
