@@ -127,8 +127,8 @@ export default function RegisterForm({
       onSwitchToLogin();
 
     } catch (err: any) {
-
-      toast.error("Error al registrarse");
+      const mensajeBackend = err?.message || "Error al registrarse";
+      toast.error(mensajeBackend);
     }
   };
 

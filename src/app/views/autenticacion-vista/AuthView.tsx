@@ -7,7 +7,7 @@ import RegisterForm from "@/components/auth/RegisterForm";
 
 export default function AuthView() {
   const [isLogin, setIsLogin] =
-    useState(true);
+    useState(false);
 
   return (
     <main className="min-h-screen bg-[#070707] px-2 sm:px-4 lg:px-6 py-4 sm:py-8 lg:py-10 text-white">
