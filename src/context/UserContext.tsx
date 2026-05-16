@@ -66,32 +66,37 @@ export function UserProvider({
   const [isHydrated, setIsHydrated] =
     useState(false);
 
-  useEffect(() => {
+useEffect(() => {
+  const storedToken = localStorage.getItem("token");
 
-    const storedToken =
-      localStorage.getItem("token");
+  if (!storedToken) {
+    setIsHydrated(true);
+    return;
+  }
 
-    if (storedToken) {
-
-      setToken(storedToken);
-
-      const decoded =
-        jwtDecode<DecodedToken>(
-          storedToken,
-        );
-
-      setUser(decoded);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(decoded),
-      );
-
+  try {
+    if (storedToken.split(".").length !== 3) {
+      throw new Error("Token inválido");
     }
 
-    setIsHydrated(true);
+    setToken(storedToken);
 
-  }, []);
+    const decoded = jwtDecode<DecodedToken>(storedToken);
+    setUser(decoded);
+
+    localStorage.setItem("user", JSON.stringify(decoded));
+
+  } catch (err) {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setToken(null);
+    setUser(null);
+  }
+
+  setIsHydrated(true);
+}, []);
 
 useEffect(() => {
   if (!user?.id) return;

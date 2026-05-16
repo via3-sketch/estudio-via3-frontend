@@ -7,29 +7,51 @@ export function middleware(request: NextRequest) {
 
   const token = request.cookies.get("userSession")?.value;
 
-  const protectedRoutes = [
-    "/mis-solicitudes",
-  ];
+  const isGoogleAuth =
+  pathname.startsWith("/autenticacion/autenticacion-google") ||
+  pathname.startsWith("/auth/google/callback");
 
-  const isProtected = protectedRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-
-  if (isProtected && !token) {
-    return NextResponse.redirect(new URL("/autenticacion", request.url));
+  if (isGoogleAuth) {
+    return NextResponse.next();
   }
 
-  if (token) {
-    try {
-      const user = jwtDecode<DecodedToken>(token);
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
 
-      if (!user.profileCompleted && pathname !== "/completar-perfil") {
-        return NextResponse.redirect(new URL("/completar-perfil", request.url));
+  const isAuthPage = pathname === "/autenticacion";
+  const isCompleteProfile = pathname === "/completar-perfil";
+
+  if (isAuthPage || isCompleteProfile) {
+    return NextResponse.next();
+  }
+
+  if (!token) {
+    return NextResponse.redirect(
+      new URL("/autenticacion", request.url)
+    );
+  }
+
+  try {
+    const user = jwtDecode<DecodedToken>(token);
+
+    if (!user.profileCompleted) {
+      if (!isCompleteProfile) {
+        return NextResponse.redirect(
+          new URL("/completar-perfil", request.url)
+        );
       }
-    } catch (err) {
-      return NextResponse.redirect(new URL("/autenticacion", request.url));
     }
-  }
 
-  return NextResponse.next();
+    return NextResponse.next();
+
+  } catch {
+    return NextResponse.redirect(
+      new URL("/autenticacion", request.url)
+    );
+  }
 }
