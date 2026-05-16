@@ -37,7 +37,7 @@ export const completeProfile = async (
   }
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/complete-profile/${id}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/users/complete-profile/${id}`,
     {
       method: "PATCH",
       headers: {

@@ -44,6 +44,8 @@ export default function LoginForm({
   ) => {
     e.preventDefault();
 
+    const form = e.currentTarget;
+
     const formData = new FormData(
       e.currentTarget,
     );
@@ -81,6 +83,8 @@ export default function LoginForm({
 
       toast.success("Login exitoso");
 
+      form.reset();
+       
       router.push("/");
 
     } catch (err: any) {
