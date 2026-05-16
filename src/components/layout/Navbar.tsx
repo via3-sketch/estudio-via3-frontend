@@ -1,17 +1,25 @@
 "use client";
 
 import Link from "next/link";
+
 import { usePathname } from "next/navigation";
+
 import { useState } from "react";
 
 import { useUser } from "@/hooks/useUser";
 
+import DropdownNotificaciones from "@/components/notifications/DropdownNotificaciones";
+
 export default function Navbar() {
-  const pathname = usePathname();
 
-  const isAuth = pathname.startsWith("/auth");
+  const pathname =
+    usePathname();
 
-  const [open, setOpen] = useState(false);
+  const isAuth =
+    pathname.startsWith("/auth");
+
+  const [open, setOpen] =
+    useState(false);
 
   const {
     isAuthenticated,
@@ -19,12 +27,21 @@ export default function Navbar() {
     user,
   } = useUser();
 
+  const isAdmin =
+    user?.role?.toLowerCase() ===
+    "admin";
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#070707]/80 backdrop-blur border-b border-white/10">
 
-      <div className="mx-auto max-w-7xl px-6 h-16 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-6 h-16 flex items-center gap-8">
 
-        <Link href="/" className="flex items-center gap-4">
+        {/* LOGO */}
+
+        <Link
+          href="/"
+          className="flex items-center gap-4 shrink-0"
+        >
 
           <img
             src="/images/logo.png"
@@ -41,7 +58,9 @@ export default function Navbar() {
         {!isAuth && (
           <>
 
-            <nav className="hidden md:flex items-center gap-8 text-sm text-gray-200">
+            {/* NAV */}
+
+            <nav className="hidden lg:flex flex-1 items-center justify-center gap-8 text-sm text-gray-200">
 
               <Link
                 href="/plataforma"
@@ -64,34 +83,54 @@ export default function Navbar() {
                 Contacto
               </Link>
 
+              {isAdmin && (
+                <Link
+                  href="/admin/requests"
+                  className="text-[#C7962D] hover:text-white transition font-medium"
+                >
+                  Admin
+                </Link>
+              )}
+
             </nav>
 
+            {/* MOBILE MENU */}
+
             <button
-              onClick={() => setOpen(!open)}
-              className="md:hidden text-white text-2xl"
+              onClick={() =>
+                setOpen(!open)
+              }
+              className="lg:hidden text-white text-2xl ml-auto"
             >
               ☰
             </button>
 
             {isAuthenticated ? (
 
-              <div className="hidden md:flex items-center gap-4">
+              <div className="flex items-center gap-4 shrink-0">
 
-                <div className="flex flex-col items-end">
+
+                <DropdownNotificaciones />
+
+              
+
+                <div className="hidden md:flex flex-col items-end w-40 overflow-hidden">
 
                   <span className="text-xs text-gray-500">
                     Conectado como
                   </span>
 
-                  <span className="text-sm text-white font-medium">
+                  <span className="text-sm text-white font-medium truncate w-full text-right">
                     {user?.email}
                   </span>
 
                 </div>
 
+                {/* LOGOUT */}
+
                 <button
                   onClick={logout}
-                  className="px-5 py-2 rounded-md text-sm font-semibold border border-[#C7962D] text-[#C7962D] hover:bg-[#C7962D] hover:text-black transition"
+                  className="hidden md:block px-5 py-2 rounded-md text-sm font-semibold border border-[#C7962D] text-[#C7962D] hover:bg-[#C7962D] hover:text-black transition cursor-pointer whitespace-nowrap"
                 >
                   Cerrar sesión
                 </button>
@@ -102,7 +141,7 @@ export default function Navbar() {
 
               <Link
                 href="/autenticacion"
-                className="hidden md:block px-5 py-2 rounded-md text-sm font-semibold bg-[#C7962D] text-black hover:opacity-90 transition"
+                className="hidden lg:block px-5 py-2 rounded-md text-sm font-semibold bg-[#C7962D] text-black hover:opacity-90 transition"
               >
                 Ingresar
               </Link>
@@ -114,13 +153,17 @@ export default function Navbar() {
 
       </div>
 
+     
+
       {open && !isAuth && (
 
-        <div className="md:hidden bg-[#070707] border-t border-white/10 flex flex-col px-6 py-6 gap-4 text-sm text-gray-200">
+        <div className="lg:hidden bg-[#070707] border-t border-white/10 flex flex-col px-6 py-6 gap-4 text-sm text-gray-200">
 
           <Link
             href="/plataforma"
-            onClick={() => setOpen(false)}
+            onClick={() =>
+              setOpen(false)
+            }
             className="hover:text-white transition"
           >
             Plataforma
@@ -128,7 +171,9 @@ export default function Navbar() {
 
           <Link
             href="/mis-solicitudes"
-            onClick={() => setOpen(false)}
+            onClick={() =>
+              setOpen(false)
+            }
             className="hover:text-white transition"
           >
             Mis solicitudes
@@ -136,11 +181,25 @@ export default function Navbar() {
 
           <Link
             href="/contacto"
-            onClick={() => setOpen(false)}
+            onClick={() =>
+              setOpen(false)
+            }
             className="hover:text-white transition"
           >
             Contacto
           </Link>
+
+          {isAdmin && (
+            <Link
+              href="/admin/requests"
+              onClick={() =>
+                setOpen(false)
+              }
+              className="text-[#C7962D] font-medium"
+            >
+              Admin
+            </Link>
+          )}
 
           {isAuthenticated ? (
 
@@ -160,19 +219,23 @@ export default function Navbar() {
               <button
                 onClick={() => {
                   logout();
+
                   setOpen(false);
                 }}
-                className="mt-2 px-5 py-3 rounded-md text-center font-semibold border border-[#C7962D] text-[#C7962D]"
+                className="mt-2 px-5 py-3 rounded-md text-center font-semibold border border-[#C7962D] text-[#C7962D] hover:bg-[#C7962D] hover:text-black cursor-pointer"
               >
                 Cerrar sesión
               </button>
+
             </>
 
           ) : (
 
             <Link
               href="/autenticacion"
-              onClick={() => setOpen(false)}
+              onClick={() =>
+                setOpen(false)
+              }
               className="mt-4 px-5 py-3 rounded-md text-center font-semibold bg-[#C7962D] text-black hover:opacity-90 transition"
             >
               Ingresar
@@ -183,6 +246,7 @@ export default function Navbar() {
         </div>
 
       )}
+
     </header>
   );
 }

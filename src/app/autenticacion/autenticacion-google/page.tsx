@@ -1,5 +1,13 @@
-import AutenticacionGoogleView from "@/app/views/AutenticacionGoogle/AutenticacionGoogleView";
+"use client";
+
+import { Suspense } from "react";
+
+import AutenticacionGoogleView from "@/app/views/autenticacion-google/AutenticacionGoogleView";
 
 export default function AutenticacionGooglePage() {
-  return <AutenticacionGoogleView />;
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <AutenticacionGoogleView />
+    </Suspense>
+  );
 }

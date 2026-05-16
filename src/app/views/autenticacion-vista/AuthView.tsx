@@ -1,17 +1,26 @@
 "use client";
 
+import { useState } from "react";
+
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 export default function AuthView() {
+  const [isLogin, setIsLogin] =
+    useState(true);
+
   return (
-    <main className="min-h-screen bg-[#070707] px-6 py-10 text-white">
+    <main className="min-h-screen bg-[#070707] px-2 sm:px-4 lg:px-6 py-4 sm:py-8 lg:py-10 text-white">
       <section className="mx-auto flex min-h-205 max-w-7xl overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0d0f] shadow-2xl">
 
         <aside className="hidden w-[32%] flex-col justify-between border-r border-white/10 bg-black/80 p-10 lg:flex">
-          
+
           <div>
-            <img src="/images/logo.png" alt="ViaCore" className="mb-12 w-24" />
+            <img
+              src="/images/logo.png"
+              alt="ViaCore"
+              className="mb-12 w-24"
+            />
 
             <h1 className="mb-4 text-3xl font-semibold tracking-wide">
               VIACORE
@@ -44,44 +53,75 @@ export default function AuthView() {
           </div>
         </aside>
 
-        <section className="flex w-full items-center justify-center p-8 lg:w-[68%]">
+        <section className="flex w-full items-center justify-center p-3 sm:p-6 lg:w-[68%] lg:p-8"
+>
           <div className="w-full max-w-5xl rounded-2xl border border-white/10 bg-white/3 backdrop-blur-sm">
 
             <div className="grid grid-cols-2 border-b border-white/10">
-              <div className="border-b-2 border-[#C7962D] py-6 text-center font-semibold text-[#C7962D]">
-                Acceder
-              </div>
 
-              <div className="py-6 text-center font-semibold text-gray-400">
+              <button
+                onClick={() =>
+                  setIsLogin(true)
+                }
+                className={`py-6 text-center font-semibold transition ${
+                  isLogin
+                    ? "border-b-2 border-[#C7962D] text-[#C7962D]"
+                    : "text-gray-400"
+                } cursor-pointer`}
+              >
+                Acceder
+              </button>
+
+              <button
+                onClick={() =>
+                  setIsLogin(false)
+                }
+                className={`py-6 text-center font-semibold transition ${
+                  !isLogin
+                    ? "border-b-2 border-[#C7962D] text-[#C7962D]"
+                    : "text-gray-400"
+                } cursor-pointer`}
+              >
                 Crear cuenta empresarial
-              </div>
+              </button>
+
             </div>
 
-            <div className="grid gap-10 p-10 md:grid-cols-2">
-              
-              <div className="border-r border-white/10 pr-10">
+            <div className="p-5 sm:p-8 lg:p-10">
+
+              <div className="w-full lg:border-r border-white/10 lg:pr-10"
+               >
+
                 <h2 className="mb-2 text-lg font-semibold">
-                  Accedé a tu espacio
+                  {isLogin
+                    ? "Accedé a tu espacio"
+                    : "Creá tu cuenta"}
                 </h2>
 
                 <div className="mb-8 mt-4 h-0.5 w-10 bg-[#C7962D]" />
 
-                <LoginForm />
+                {isLogin ? (
+                  <LoginForm
+                    onSwitchToRegister={() =>
+                      setIsLogin(false)
+                    }
+                  />
+                ) : (
+                  <RegisterForm
+                    onSwitchToLogin={() =>
+                      setIsLogin(true)
+                    }
+                  />
+                )}
+
               </div>
 
-              <div>
-                <h2 className="mb-2 text-lg font-semibold">
-                  Comenzá con ViaCore
-                </h2>
-
-                <div className="mb-8 mt-4 h-0.5 w-10 bg-[#C7962D]" />
-
-                <RegisterForm />
-              </div>
+              <div />
 
             </div>
           </div>
         </section>
+
       </section>
     </main>
   );

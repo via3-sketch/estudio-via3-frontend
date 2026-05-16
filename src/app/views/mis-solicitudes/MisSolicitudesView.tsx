@@ -2,35 +2,107 @@
 
 import Link from "next/link";
 
-import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { useEffect, useState } from "react";
+
+import { getMyTrainingRequests } from "@/services/trainingRequests.service";
+
+import { socket } from "@/lib/socket";
+
+interface TrainingRequest {
+  id: string;
+
+  status:
+    | "pending"
+    | "scheduled"
+    | "in_review"
+    | "awaiting_payment"
+    | "confirmed"
+    | "cancelled";
+
+  createdAt: string;
+
+  training: {
+    title: string;
+  };
+}
 
 export default function MisSolicitudesView() {
 
-  const stored =
-    typeof window !== "undefined"
-      ? localStorage.getItem("solicitudes")
-      : null;
+  const [solicitudes, setSolicitudes] =
+    useState<
+      TrainingRequest[]
+    >([]);
 
-  const solicitudes = stored
-    ? JSON.parse(stored)
-    : [
-        {
-          id: "1",
-          categoria: "Liderazgo de equipos",
-          estado: "Pendiente",
-          fecha: "12/05/2026",
-        },
-        {
-          id: "2",
-          categoria: "Comunicación y feedback",
-          estado: "Aprobado",
-          fecha: "10/05/2026",
-        },
-      ];
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+
+    const fetchRequests =
+      async () => {
+        try {
+
+          const token =
+            localStorage.getItem(
+              "token",
+            );
+
+          if (!token) {
+            return;
+          }
+
+          const data =
+            await getMyTrainingRequests(
+              token,
+            );
+
+          setSolicitudes(data);
+
+        } catch (error) {
+
+          console.error(error);
+
+        } finally {
+
+          setLoading(false);
+
+        }
+      };
+
+    fetchRequests();
+
+    socket.on(
+      "notification:new",
+      async () => {
+
+        const token =
+          localStorage.getItem(
+            "token",
+          );
+
+        if (!token) return;
+
+        const updatedRequests =
+          await getMyTrainingRequests(
+            token,
+          );
+
+        setSolicitudes(
+          updatedRequests,
+        );
+      },
+    );
+
+    return () => {
+
+      socket.off(
+        "notification:new",
+      );
+    };
+
+  }, []);
 
   return (
-    <ProtectedRoute>
-
       <div className="bg-[#070707] text-white px-6 pt-32 pb-24 min-h-screen">
         <div className="mx-auto max-w-5xl">
 
@@ -38,74 +110,103 @@ export default function MisSolicitudesView() {
             Mis solicitudes
           </h1>
 
-          <div className="space-y-6">
+          {loading ? (
+            <p className="text-gray-400">
+              Cargando solicitudes...
+            </p>
+          ) : solicitudes.length === 0 ? (
+            <div className="border border-white/10 rounded-xl bg-white/5 p-10 text-center">
+              <p className="text-gray-400">
+                Todavía no realizaste
+                ninguna solicitud.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
 
-            {solicitudes.map((sol: any) => {
+              {solicitudes.map((sol) => {
 
-              const agendaGuardada =
-                typeof window !== "undefined"
-                  ? localStorage.getItem(`agenda-${sol.id}`)
-                  : null;
+                const estadoVisual =
+                  sol.status ===
+                  "confirmed"
+                    ? "Confirmado"
+                    : sol.status ===
+                      "cancelled"
+                    ? "Cancelado"
+                    : sol.status ===
+                      "scheduled"
+                    ? "Agendado"
+                    : sol.status ===
+                      "in_review"
+                    ? "En revisión"
+                    : sol.status ===
+                      "awaiting_payment"
+                    ? "Esperando pago"
+                    : "Pendiente";
 
-              const estadoVisual =
-                sol.estado === "Pagado"
-                  ? "Pagado"
-                  : agendaGuardada
-                  ? "Agendado"
-                  : sol.estado;
+                return (
+                  <div
+                    key={sol.id}
+                    className="border border-white/10 p-6 rounded-xl bg-white/5 flex flex-col md:flex-row md:items-center md:justify-between"
+                  >
+                    <div>
 
-              return (
-                <div
-                  key={sol.id}
-                  className="border border-white/10 p-6 rounded-xl bg-white/5 flex flex-col md:flex-row md:items-center md:justify-between"
-                >
-                  <div>
+                      <h3 className="text-lg font-semibold">
+                        {sol.training.title}
+                      </h3>
 
-                    <h3 className="text-lg font-semibold">
-                      {sol.categoria}
-                    </h3>
+                      <p className="text-gray-400 text-sm">
+                        Fecha:{" "}
+                        {new Date(
+                          sol.createdAt,
+                        ).toLocaleDateString(
+                          "es-AR",
+                        )}
+                      </p>
 
-                    <p className="text-gray-400 text-sm">
-                      Fecha: {sol.fecha}
-                    </p>
+                    </div>
 
+                    <div className="mt-4 md:mt-0 flex items-center gap-4">
+
+                      <span
+                        className={`px-3 py-1 text-sm rounded-full ${
+                          estadoVisual ===
+                          "Pendiente"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : estadoVisual ===
+                                "Confirmado"
+                            ? "bg-green-500/20 text-green-400"
+                            : estadoVisual ===
+                                "Cancelado"
+                            ? "bg-red-500/20 text-red-400"
+                            : estadoVisual ===
+                                "Agendado"
+                            ? "bg-purple-500/20 text-purple-400"
+                            : estadoVisual ===
+                                "En revisión"
+                            ? "bg-blue-500/20 text-blue-400"
+                            : "bg-orange-500/20 text-orange-400"
+                        }`}
+                      >
+                        {estadoVisual}
+                      </span>
+
+                      <Link
+                        href={`/mis-solicitudes/${sol.id}`}
+                        className="text-sm text-[#C7962D] hover:underline"
+                      >
+                        Ver detalle
+                      </Link>
+
+                    </div>
                   </div>
+                );
+              })}
 
-                  <div className="mt-4 md:mt-0 flex items-center gap-4">
-
-                    <span
-                      className={`px-3 py-1 text-sm rounded-full ${
-                        estadoVisual === "Pendiente"
-                          ? "bg-yellow-500/20 text-yellow-400"
-                          : estadoVisual === "Aprobado"
-                          ? "bg-blue-500/20 text-blue-400"
-                          : estadoVisual === "Agendado"
-                          ? "bg-purple-500/20 text-purple-400"
-                          : estadoVisual === "Pagado"
-                          ? "bg-green-500/20 text-green-400"
-                          : ""
-                      }`}
-                    >
-                      {estadoVisual}
-                    </span>
-
-                    <Link
-                      href={`/mis-solicitudes/${sol.id}`}
-                      className="text-sm text-[#C7962D] hover:underline"
-                    >
-                      Ver detalle
-                    </Link>
-
-                  </div>
-                </div>
-              );
-            })}
-
-          </div>
+            </div>
+          )}
 
         </div>
       </div>
-
-    </ProtectedRoute>
   );
 }

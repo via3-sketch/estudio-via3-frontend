@@ -1,15 +1,19 @@
 import EditServiceView from "@/app/views/admin/EditServiceView";
 
-type EditServicePageProps = {
+export default async function EditServicePage({
+  params,
+}: {
   params: Promise<{
     id: string;
   }>;
-};
+}) {
 
-export default async function EditServicePage({
-  params,
-}: EditServicePageProps) {
-  const { id } = await params;
+  const { id } =
+    await params;
 
-  return <EditServiceView id={id} />;
+  return (
+    <EditServiceView
+      id={id}
+    />
+  );
 }

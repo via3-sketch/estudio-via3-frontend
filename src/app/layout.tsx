@@ -1,9 +1,12 @@
 import "./globals.css";
 
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-
 import { UserProvider } from "@/context/UserContext";
+
+import { NotificationProvider } from "@/context/NotificationContext";
+
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
+
+import { Toaster } from "sonner";
 
 export default function RootLayout({
   children,
@@ -12,21 +15,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
+
       <body className="bg-[#070707] text-white flex flex-col min-h-screen">
 
         <UserProvider>
 
-          <Navbar />
+          <NotificationProvider>
 
-          <main className="pt-16 flex-1">
-            {children}
-          </main>
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
 
-          <Footer />
+          </NotificationProvider>
 
         </UserProvider>
 
+        <Toaster richColors duration={8000} />
+
       </body>
+
     </html>
   );
 }

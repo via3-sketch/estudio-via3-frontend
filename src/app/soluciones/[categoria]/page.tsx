@@ -53,7 +53,7 @@ export default async function SolucionPage({
        
         <Link
           href={`/solicitudes?categoria=${categoria}`}
-          className="inline-block px-8 py-4 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition"
+          className="inline-block px-8 py-4 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition w-full sm:w-auto"
         >
           Solicitar capacitación
         </Link>

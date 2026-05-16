@@ -8,7 +8,9 @@ import Input from "@/components/ui/Input";
 
 import Button from "@/components/ui/Button";
 
-import { completeProfile } from "@/services/auth.service";
+import { completeProfile } from "@/services/auth.service"; 
+
+import { toast } from "sonner";
 
 type DecodedToken = {
   id: string;
@@ -23,10 +25,13 @@ type DecodedToken = {
 export default function CompleteProfileForm() {
   const router = useRouter();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (
+    e: any,
+  ) => {
     e.preventDefault();
 
-    const token = localStorage.getItem("token");
+    const token =
+      localStorage.getItem("token");
 
     if (!token) {
       return;
@@ -35,17 +40,23 @@ export default function CompleteProfileForm() {
     const decoded =
       jwtDecode<DecodedToken>(token);
 
+    const form =
+      e.currentTarget;
+
     const formData = new FormData(
-      e.currentTarget,
+      form,
     );
 
     const payload = {
       phone:
-        Number(formData.get("phone")) || 0,
+        formData
+          .get("phone")
+          ?.toString() || "",
 
       country:
-        formData.get("country")?.toString() ||
-        "",
+        formData
+          .get("country")
+          ?.toString() || "",
 
       companyName:
         formData
@@ -53,8 +64,9 @@ export default function CompleteProfileForm() {
           ?.toString() || "",
 
       city:
-        formData.get("city")?.toString() ||
-        "",
+        formData
+          .get("city")
+          ?.toString() || "",
 
       address:
         formData
@@ -63,19 +75,25 @@ export default function CompleteProfileForm() {
     };
 
     try {
-      await completeProfile(
+      const res = await completeProfile(
         decoded.id,
         payload,
       );
 
-      alert("Perfil completado");
+      localStorage.setItem("token", res.access_token);
+
+      toast.success(
+        "Perfil completado",
+      );
+
+      form.reset();
 
       router.push("/");
 
-    } catch (err) {
-      console.log(err);
+    } catch (err: any) {
+      toast.error(err.message)
 
-      alert(
+      toast.error(
         "Error al completar perfil",
       );
     }
@@ -89,76 +107,107 @@ export default function CompleteProfileForm() {
 
       <div className="grid grid-cols-2 gap-4">
 
-        <Input
-          name="phone"
-          type="tel"
-          placeholder="Teléfono"
-        />
+        <div>
+          <Input
+            name="phone"
+            type="tel"
+            placeholder="Teléfono"
+          />
 
-        <select
-          name="country"
-          defaultValue=""
-          className="
-            w-full
-            rounded-xl
-            border
-            border-white/10
-            bg-[#0D0D0D]
-            px-4
-            py-3
-            text-sm
-            text-white
-            outline-none
-            transition
-            focus:border-[#C7962D]
-          "
-        >
+          <p className="mt-2 text-xs text-gray-500">
+            Número de contacto de la
+            empresa
+          </p>
+        </div>
 
-          <option value="" disabled>
-            🌍 Seleccionar país
-          </option>
+        <div>
 
-          <option value="Argentina">
-            🇦🇷 Argentina
-          </option>
+          <select
+            name="country"
+            defaultValue=""
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-[#0D0D0D]
+              px-4
+              py-3
+              text-sm
+              text-white
+              outline-none
+              transition
+              focus:border-[#C7962D]
+            "
+          >
 
-          <option value="Uruguay">
-            🇺🇾 Uruguay
-          </option>
+            <option
+              value=""
+              disabled
+            >
+              🌍 Seleccionar país
+            </option>
 
-          <option value="Chile">
-            🇨🇱 Chile
-          </option>
+            <option value="Argentina">
+              🇦🇷 Argentina
+            </option>
 
-          <option value="Brasil">
-            🇧🇷 Brasil
-          </option>
+            <option value="Uruguay">
+              🇺🇾 Uruguay
+            </option>
 
-          <option value="México">
-            🇲🇽 México
-          </option>
+            <option value="Chile">
+              🇨🇱 Chile
+            </option>
 
-          <option value="España">
-            🇪🇸 España
-          </option>
+            <option value="Brasil">
+              🇧🇷 Brasil
+            </option>
 
-          <option value="Estados Unidos">
-            🇺🇸 Estados Unidos
-          </option>
+            <option value="México">
+              🇲🇽 México
+            </option>
 
-        </select>
+            <option value="España">
+              🇪🇸 España
+            </option>
 
-        <Input
-          name="city"
-          type="text"
-          placeholder="Ciudad"
-        />
+            <option value="Estados Unidos">
+              🇺🇸 Estados Unidos
+            </option>
 
-        <Input
-          name="address"
-          type="text"
-          placeholder="Dirección"
-        />
+          </select>
+
+          <p className="mt-2 text-xs text-gray-500">
+            País donde opera la
+            empresa
+          </p>
+
+        </div>
+
+        <div>
+          <Input
+            name="city"
+            type="text"
+            placeholder="Ciudad"
+          />
+
+          <p className="mt-2 text-xs text-gray-500">
+            Ciudad principal
+          </p>
+        </div>
+
+        <div>
+          <Input
+            name="address"
+            type="text"
+            placeholder="Dirección"
+          />
+
+          <p className="mt-2 text-xs text-gray-500">
+            Dirección empresarial
+          </p>
+        </div>
 
         <div className="col-span-2">
 
@@ -167,6 +216,11 @@ export default function CompleteProfileForm() {
             type="text"
             placeholder="Empresa"
           />
+
+          <p className="mt-2 text-xs text-gray-500">
+            Nombre de la empresa o
+            institución
+          </p>
 
         </div>
 

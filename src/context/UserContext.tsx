@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -9,10 +10,20 @@ import {
 
 import { jwtDecode } from "jwt-decode";
 
-type DecodedToken = {
+import { useRouter } from "next/navigation";
+
+import { toast } from "sonner";
+
+import { socket } from "@/lib/socket";
+
+ export type DecodedToken = {
   id: string;
+
   email: string;
+
   role: string;
+
+  profileCompleted: boolean;
 };
 
 type UserContextType = {
@@ -22,6 +33,8 @@ type UserContextType = {
 
   isAuthenticated: boolean;
 
+  isProfileCompleted: boolean;
+
   isHydrated: boolean;
 
   login: (token: string) => void;
@@ -29,67 +42,133 @@ type UserContextType = {
   logout: () => void;
 };
 
-const UserContext = createContext<UserContextType | undefined>(
-  undefined
-);
+const UserContext =
+  createContext<
+    UserContextType | undefined
+  >(undefined);
 
 export function UserProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [token, setToken] = useState<string | null>(null);
 
-  const [user, setUser] = useState<DecodedToken | null>(
-    null
-  );
+  const [token, setToken] =
+    useState<string | null>(null);
 
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [user, setUser] =
+    useState<DecodedToken | null>(
+      null,
+    );
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
+  const router = useRouter();
 
-    if (storedToken) {
-      setToken(storedToken);
+  const [isHydrated, setIsHydrated] =
+    useState(false);
 
-      const decoded = jwtDecode<DecodedToken>(
-        storedToken
-      );
+useEffect(() => {
+  const storedToken = localStorage.getItem("token");
 
-      setUser(decoded);
+  if (!storedToken) {
+    setIsHydrated(true);
+    return;
+  }
+
+  try {
+    if (storedToken.split(".").length !== 3) {
+      throw new Error("Token inválido");
     }
 
-    setIsHydrated(true);
-  }, []);
+    setToken(storedToken);
 
-  const login = (newToken: string) => {
+    const decoded = jwtDecode<DecodedToken>(storedToken);
+    setUser(decoded);
+
+    localStorage.setItem("user", JSON.stringify(decoded));
+
+  } catch (err) {
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    setToken(null);
+    setUser(null);
+  }
+
+  setIsHydrated(true);
+}, []);
+
+useEffect(() => {
+  if (!user?.id) return;
+
+  socket.connect();
+  socket.emit("join", user.id);
+
+  const handler = (notification: any) => {
+    toast.success(notification.message || "Nueva notificación");
+  };
+
+  socket.on("notification:new", handler);
+
+  return () => {
+    socket.off("notification:new", handler);
+    socket.disconnect();
+  };
+}, [user?.id]);
+
+const login = (newToken: string) => {
+  try {
     localStorage.setItem("token", newToken);
+
+    document.cookie = `userSession=${newToken}; path=/; max-age=86400`;
 
     setToken(newToken);
 
-    const decoded = jwtDecode<DecodedToken>(
-      newToken
-    );
+    const decoded = jwtDecode<DecodedToken>(newToken);
+
+    localStorage.setItem("user", JSON.stringify(decoded));
 
     setUser(decoded);
-  };
+  } catch (error) {
+    toast.error("Token inválido");
+  }
+};
 
   const logout = () => {
-    localStorage.removeItem("token");
+
+    localStorage.removeItem(
+      "token",
+    );
+
+    localStorage.removeItem(
+      "user",
+    );
+
+    document.cookie = "userSession=; path=/; max-age=0";
 
     setToken(null);
 
     setUser(null);
+
+    router.push("/");
+
+    toast.success(
+      "Sesión cerrada exitosamente",
+    );
   };
 
   return (
     <UserContext.Provider
       value={{
+
         token,
 
         user,
 
-        isAuthenticated: !!token,
+        isAuthenticated:
+          !!token,
+
+        isProfileCompleted: !!user?.profileCompleted,
 
         isHydrated,
 
@@ -104,12 +183,16 @@ export function UserProvider({
 }
 
 export function useUserContext() {
-  const context = useContext(UserContext);
+
+  const context =
+    useContext(UserContext);
 
   if (!context) {
+
     throw new Error(
-      "useUserContext debe usarse dentro de UserProvider"
+      "useUserContext debe usarse dentro de UserProvider",
     );
+
   }
 
   return context;

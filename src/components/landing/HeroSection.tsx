@@ -24,15 +24,17 @@ export default function HeroSection() {
           </h1>
 
           <p className="text-gray-300 text-lg mb-10 leading-relaxed">
-            Pedí capacitaciones, coordiná sesiones y seguí todo en tiempo real.
+            Explorá capacitaciones, coordiná procesos y seguí todo desde un solo lugar.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
 
-           
-            <Button>Solicitar capacitación ahora</Button>
+            <Link href="/plataforma">
+              <Button className="w-full sm:w-auto">
+                Explorar capacitaciones
+              </Button>
+            </Link>
 
-           
             <Link
               href="/casos"
               className="px-5 py-3 rounded-md font-normal border border-white/20 text-sm hover:border-[#C7962D] transition text-center"
