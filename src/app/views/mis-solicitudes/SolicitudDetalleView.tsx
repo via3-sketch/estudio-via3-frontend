@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
 import { getTrainingRequestById } from "@/services/trainingRequests.service";
 
@@ -17,28 +14,21 @@ export default function SolicitudDetalleView({
   id,
 }: SolicitudDetalleViewProps) {
   const [solicitud, setSolicitud] =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useState<any>(null);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSolicitud = async () => {
       try {
-        const token =
-          localStorage.getItem(
-            "token",
-          );
+        const token = localStorage.getItem("token");
 
         if (!token) {
           return;
         }
 
-        const data =
-          await getTrainingRequestById(
-            id,
-            token,
-          );
+        const data = await getTrainingRequestById(id, token);
 
         setSolicitud(data);
       } catch (error) {
@@ -73,20 +63,14 @@ export default function SolicitudDetalleView({
 
   const agendaGuardada =
     typeof window !== "undefined"
-      ? localStorage.getItem(
-          `agenda-${solicitud.id}`,
-        )
+      ? localStorage.getItem(`agenda-${solicitud.id}`)
       : null;
 
   const tieneAgenda = !!agendaGuardada;
 
-  const agendaData = agendaGuardada
-    ? JSON.parse(agendaGuardada)
-    : null;
+  const agendaData = agendaGuardada ? JSON.parse(agendaGuardada) : null;
 
-  const getStatusLabel = (
-    status: string,
-  ) => {
+  const getStatusLabel = (status: string) => {
     switch (status) {
       case "pending":
         return "Pendiente";
@@ -111,9 +95,7 @@ export default function SolicitudDetalleView({
     }
   };
 
-  const getStatusColor = (
-    status: string,
-  ) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "text-yellow-400";
@@ -147,12 +129,7 @@ export default function SolicitudDetalleView({
 
         <div className="flex gap-3 text-xs md:text-sm text-gray-500 mb-8 flex-wrap">
           <span
-            className={
-              solicitud.status ===
-              "pending"
-                ? "text-yellow-400"
-                : ""
-            }
+            className={solicitud.status === "pending" ? "text-yellow-400" : ""}
           >
             ● Pendiente
           </span>
@@ -160,12 +137,7 @@ export default function SolicitudDetalleView({
           <span>→</span>
 
           <span
-            className={
-              solicitud.status ===
-              "in_review"
-                ? "text-blue-400"
-                : ""
-            }
+            className={solicitud.status === "in_review" ? "text-blue-400" : ""}
           >
             ● En revisión
           </span>
@@ -174,10 +146,7 @@ export default function SolicitudDetalleView({
 
           <span
             className={
-              solicitud.status ===
-              "scheduled"
-                ? "text-purple-400"
-                : ""
+              solicitud.status === "scheduled" ? "text-purple-400" : ""
             }
           >
             ● Agendado
@@ -187,10 +156,7 @@ export default function SolicitudDetalleView({
 
           <span
             className={
-              solicitud.status ===
-              "awaiting_payment"
-                ? "text-orange-400"
-                : ""
+              solicitud.status === "awaiting_payment" ? "text-orange-400" : ""
             }
           >
             ● Esperando pago
@@ -199,12 +165,7 @@ export default function SolicitudDetalleView({
           <span>→</span>
 
           <span
-            className={
-              solicitud.status ===
-              "confirmed"
-                ? "text-green-400"
-                : ""
-            }
+            className={solicitud.status === "confirmed" ? "text-green-400" : ""}
           >
             ● Confirmado
           </span>
@@ -212,9 +173,7 @@ export default function SolicitudDetalleView({
 
         <div className="space-y-6 border border-white/10 p-8 rounded-2xl bg-[#0B0D0F]">
           <div>
-            <p className="text-gray-400 text-sm">
-              Capacitación
-            </p>
+            <p className="text-gray-400 text-sm">Capacitación</p>
 
             <p className="text-xl font-medium mt-1">
               {solicitud.training.title}
@@ -222,51 +181,33 @@ export default function SolicitudDetalleView({
           </div>
 
           <div>
-            <p className="text-gray-400 text-sm">
-              Estado actual
-            </p>
+            <p className="text-gray-400 text-sm">Estado actual</p>
 
             <p
               className={`text-lg font-medium mt-1 ${getStatusColor(
                 solicitud.status,
               )}`}
             >
-              {getStatusLabel(
-                solicitud.status,
-              )}
+              {getStatusLabel(solicitud.status)}
             </p>
           </div>
 
           <div>
-            <p className="text-gray-400 text-sm">
-              Fecha de solicitud
-            </p>
+            <p className="text-gray-400 text-sm">Fecha de solicitud</p>
 
             <p className="text-lg mt-1">
-              {new Date(
-                solicitud.createdAt,
-              ).toLocaleDateString(
-                "es-AR",
-              )}
+              {new Date(solicitud.createdAt).toLocaleDateString("es-AR")}
             </p>
           </div>
 
           <div>
-            <p className="text-gray-400 text-sm">
-              Participantes
-            </p>
+            <p className="text-gray-400 text-sm">Participantes</p>
 
-            <p className="text-lg mt-1">
-              {
-                solicitud.participantsCount
-              }
-            </p>
+            <p className="text-lg mt-1">{solicitud.participantsCount}</p>
           </div>
 
           <div>
-            <p className="text-gray-400 text-sm">
-              Objetivos
-            </p>
+            <p className="text-gray-400 text-sm">Objetivos</p>
 
             <p className="text-lg mt-1 leading-relaxed">
               {solicitud.objectives}
@@ -274,118 +215,94 @@ export default function SolicitudDetalleView({
           </div>
 
           <div>
-            <p className="text-gray-400 text-sm">
-              Contexto organizacional
-            </p>
+            <p className="text-gray-400 text-sm">Contexto organizacional</p>
 
-            <p className="text-lg mt-1 leading-relaxed">
-              {solicitud.context}
-            </p>
+            <p className="text-lg mt-1 leading-relaxed">{solicitud.context}</p>
           </div>
 
           <div className="pt-2">
-            <p className="text-gray-400 text-sm mb-3">
-              Seguimiento
-            </p>
+            <p className="text-gray-400 text-sm mb-3">Seguimiento</p>
 
             <div className="space-y-2 text-sm">
               <p className="text-green-400">
                 ✔️ Solicitud registrada correctamente
               </p>
 
-              {solicitud.status ===
-                "in_review" && (
+              {solicitud.status === "in_review" && (
                 <p className="text-blue-400">
                   ✔️ La solicitud está siendo evaluada
                 </p>
               )}
 
-              {solicitud.status ===
-                "scheduled" && (
+              {solicitud.status === "scheduled" && (
                 <p className="text-purple-400">
                   ✔️ Reunión de diagnóstico coordinada
                 </p>
               )}
 
-              {solicitud.status ===
-                "awaiting_payment" && (
+              {solicitud.status === "awaiting_payment" && (
                 <p className="text-orange-400">
                   ✔️ Esperando confirmación del pago
                 </p>
               )}
 
-              {solicitud.status ===
-                "confirmed" && (
-                <p className="text-green-400">
-                  ✔️ Capacitación confirmada
-                </p>
+              {solicitud.status === "confirmed" && (
+                <p className="text-green-400">✔️ Capacitación confirmada</p>
               )}
 
-              {solicitud.status ===
-                "cancelled" && (
-                <p className="text-red-400">
-                  ✔️ Solicitud cancelada
-                </p>
+              {solicitud.status === "cancelled" && (
+                <p className="text-red-400">✔️ Solicitud cancelada</p>
               )}
             </div>
           </div>
 
-          {tieneAgenda &&
-            agendaData && (
-              <div className="border-t border-white/10 pt-6">
-                <p className="text-gray-400 text-sm mb-2">
-                  Reunión agendada
-                </p>
+          {tieneAgenda && agendaData && (
+            <div className="border-t border-white/10 pt-6">
+              <p className="text-gray-400 text-sm mb-2">Reunión agendada</p>
 
-                <p className="text-lg">
-                  {agendaData.fecha} —{" "}
-                  {agendaData.horario}
-                </p>
-              </div>
-            )}
-        </div>
-
-        {solicitud.status ===
-          "in_review" &&
-          !tieneAgenda && (
-            <div className="mt-10 flex justify-between items-center border border-blue-500/20 bg-blue-500/10 rounded-xl p-5">
-              <span className="text-sm text-blue-300">
-                Tu solicitud fue aprobada para coordinación inicial.
-              </span>
-
-              <Link
-                href={`/agenda/${solicitud.id}`}
-                className="px-6 py-3 bg-blue-500 text-white rounded-md font-semibold hover:opacity-90 transition"
-              >
-                Agendar reunión
-              </Link>
+              <p className="text-lg">
+                {agendaData.fecha} — {agendaData.horario}
+              </p>
             </div>
           )}
+        </div>
 
-     {solicitud.status === "scheduled" && (
-        <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
+        {solicitud.status === "in_review" && !tieneAgenda && (
+          <div className="mt-10 flex justify-between items-center border border-blue-500/20 bg-blue-500/10 rounded-xl p-5">
+            <span className="text-sm text-blue-300">
+              Tu solicitud fue aprobada para coordinación inicial.
+            </span>
 
-        <span className="text-sm text-[#F4D27A]">
-          La reunión fue coordinada correctamente.
-       </span>
+            <Link
+              href={`/agenda/${solicitud.id}`}
+              className="px-6 py-3 bg-blue-500 text-white rounded-md font-semibold hover:opacity-90 transition"
+            >
+              Agendar reunión
+            </Link>
+          </div>
+        )}
 
-       <Link
-         href={`/pago/${solicitud.id}`}
-         className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold"
-       >
-         Continuar al pago
-       </Link>
+        {solicitud.status === "scheduled" && (
+          <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
+            <span className="text-sm text-[#F4D27A]">
+              La reunión fue coordinada correctamente.
+            </span>
 
-       </div>
-       )}
+            <Link
+              href={`/pago/${solicitud.id}`}
+              className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold"
+            >
+              Continuar al pago
+            </Link>
+          </div>
+        )}
 
-          <Link
-            href="/mis-solicitudes"
-            className="text-[#C7962D] hover:underline"
-          >
-            ← Volver
-          </Link>
-        
+        <Link
+          href="/mis-solicitudes"
+          className="text-[#C7962D] hover:underline"
+        >
+          ← Volver
+        </Link>
       </div>
     </div>
   );
