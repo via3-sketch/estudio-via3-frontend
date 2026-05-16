@@ -209,7 +209,7 @@ export default function SolicitudDetalleView({
           <div>
             <p className="text-gray-400 text-sm">Objetivos</p>
 
-            <p className="text-lg mt-1 leading-relaxed">
+            <p className="text-lg mt-1 leading-relaxed break-words">
               {solicitud.objectives}
             </p>
           </div>
@@ -217,7 +217,9 @@ export default function SolicitudDetalleView({
           <div>
             <p className="text-gray-400 text-sm">Contexto organizacional</p>
 
-            <p className="text-lg mt-1 leading-relaxed">{solicitud.context}</p>
+            <p className="text-lg mt-1 leading-relaxed break-words">
+              {solicitud.context}
+            </p>
           </div>
 
           <div className="pt-2">
