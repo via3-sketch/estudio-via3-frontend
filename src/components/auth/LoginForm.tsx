@@ -1,8 +1,6 @@
 "use client";
 
-import {
-  useState,
-} from "react";
+import { useState } from "react";
 
 import {
   Eye,
@@ -25,25 +23,13 @@ import { useUser } from "@/hooks/useUser";
 
 import { toast } from "sonner";
 
-import { jwtDecode } from "jwt-decode";
-
-type DecodedToken = {
-  id: string;
-
-  email: string;
-
-  role: string;
-
-  profileCompleted: boolean;
-};
-
 type LoginFormProps = {
   onSwitchToRegister: () => void;
 };
 
 export default function LoginForm({
   onSwitchToRegister,
-}: LoginFormProps) { 
+}: LoginFormProps) {
   const router = useRouter();
 
   const { login } = useUser();
@@ -57,6 +43,8 @@ export default function LoginForm({
     e: any,
   ) => {
     e.preventDefault();
+
+    const form = e.currentTarget;
 
     const formData = new FormData(
       e.currentTarget,
@@ -89,21 +77,14 @@ export default function LoginForm({
         await loginUser(result.data);
 
       const token =
-         data.access_token;
-
-      const decoded =
-      jwtDecode<DecodedToken>(token);
+        data.access_token;
 
       login(token);
 
       toast.success("Login exitoso");
 
-     if (!decoded.profileCompleted) {
-      router.push("/completar-perfil");
-
-      return;
-    }
-
+      form.reset();
+       
       router.push("/");
 
     } catch (err: any) {

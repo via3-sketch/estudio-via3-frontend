@@ -20,33 +20,39 @@ export const loginUser = (payload: {
   });
 };
 
-export const completeProfile = (
+export const completeProfile = async (
   id: string,
   payload: {
     phone: string;
-
     country: string;
-
     companyName: string;
-
     city: string;
-
     address: string;
   },
 ) => {
   const token = localStorage.getItem("token");
 
-  return api(`/users/complete-profile/${id}`, {
-    method: "PATCH",
+  if (!token) {
+    throw new Error("No token found");
+  }
 
-    headers: {
-           "Content-Type":
-          "application/json",
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/users/complete-profile/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
 
-      Authorization: `Bearer ${token}`,
-    },
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(error || "Error completando perfil");
+  }
 
-    body: JSON.stringify(payload),
-  });
+  return res.json();
 };
 

@@ -30,7 +30,7 @@ export default function RootLayout({
 
         </UserProvider>
 
-        <Toaster richColors />
+        <Toaster richColors duration={8000} />
 
       </body>
 

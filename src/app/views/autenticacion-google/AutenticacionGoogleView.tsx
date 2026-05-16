@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import {
   useRouter,
@@ -26,66 +30,90 @@ type DecodedToken = {
 export default function AutenticacionGoogleView() {
   const router = useRouter();
 
-  const searchParams = useSearchParams();
+  const searchParams =
+    useSearchParams();
 
   const { login } = useUser();
 
-  const hasLogged = useRef(false);
+  const hasLogged =
+    useRef(false);
 
-useEffect(() => {
-  if (hasLogged.current) return;
+  const [mounted, setMounted] =
+    useState(false);
 
-  try {
-    const token =
-      searchParams.get("token");
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-    const isLogin =
-      searchParams.get("login");
+  useEffect(() => {
+    if (!mounted) return;
 
-    if (!token) {
+    if (hasLogged.current) return;
+
+    try {
+      const token =
+        searchParams.get("token");
+
+      const isLogin =
+        searchParams.get("login");
+
+      if (!token) {
+        toast.error(
+          "Error al autenticar con Google",
+        );
+
+        router.push(
+          "/autenticacion",
+        );
+
+        return;
+      }
+
+      hasLogged.current = true;
+
+      const decoded =
+        jwtDecode<DecodedToken>(token);
+
+      login(token);
+
+      if (isLogin === "true") {
+        toast.success(
+          "Sesión iniciada con Google",
+        );
+      } else {
+        toast.success(
+          "Cuenta creada con Google",
+        );
+      }
+
+      if (
+        !decoded.profileCompleted
+      ) {
+        router.push(
+          "/completar-perfil",
+        );
+
+        return;
+      }
+
+      router.push("/");
+    } catch {
       toast.error(
         "Error al autenticar con Google",
       );
-      setTimeout(() => {
-      router.push("/login");
-      },0)
-      return;
-    }
 
-    hasLogged.current = true;
-
-    const decoded =
-      jwtDecode<DecodedToken>(token);
-
-    login(token);
-
-    setTimeout(() => {
-    if (isLogin === "true") {
-      toast.success(
-        "Sesión iniciada con Google",
-      );
-    } else {
-      toast.success(
-        "Cuenta creada con Google",
+      router.push(
+        "/autenticacion",
       );
     }
-  }, 0)
+  }, [
+    mounted,
+    searchParams,
+    login,
+    router,
+  ]);
 
-    if (!decoded.profileCompleted) {
-      router.push("/completar-perfil");
-
-      return;
-    }
-
-    router.push("/");
-  } catch (error) {
-    toast.error(
-      "Error al autenticar con Google",
-    );
-
-    router.push("/login");
-  }
-}, [searchParams, login, router]);
+  if (!mounted) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center text-white">

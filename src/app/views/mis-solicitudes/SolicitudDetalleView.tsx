@@ -362,28 +362,22 @@ export default function SolicitudDetalleView({
             </div>
           )}
 
-        {tieneAgenda && (
-          <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
-            <span className="text-sm text-[#F4D27A]">
-              La reunión fue coordinada correctamente.
-            </span>
+     {solicitud.status === "scheduled" && (
+        <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
 
-            <Link
-              href={`/pago/${solicitud.id}`}
-              className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold hover:opacity-90 transition"
-            >
-              Continuar al pago
-            </Link>
-          </div>
-        )}
+        <span className="text-sm text-[#F4D27A]">
+          La reunión fue coordinada correctamente.
+       </span>
 
-        <div className="mt-10 flex items-center gap-6">
-          <Link
-            href={`/mis-solicitudes/edit/${solicitud.id}`}
-            className="text-[#C7962D] hover:underline"
-          >
-            Editar solicitud
-          </Link>
+       <Link
+         href={`/pago/${solicitud.id}`}
+         className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold"
+       >
+         Continuar al pago
+       </Link>
+
+       </div>
+       )}
 
           <Link
             href="/mis-solicitudes"
@@ -391,7 +385,7 @@ export default function SolicitudDetalleView({
           >
             ← Volver
           </Link>
-        </div>
+        
       </div>
     </div>
   );

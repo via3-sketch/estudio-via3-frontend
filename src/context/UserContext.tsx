@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -15,12 +16,14 @@ import { toast } from "sonner";
 
 import { socket } from "@/lib/socket";
 
-type DecodedToken = {
+ export type DecodedToken = {
   id: string;
 
   email: string;
 
   role: string;
+
+  profileCompleted: boolean;
 };
 
 type UserContextType = {
@@ -29,6 +32,8 @@ type UserContextType = {
   user: DecodedToken | null;
 
   isAuthenticated: boolean;
+
+  isProfileCompleted: boolean;
 
   isHydrated: boolean;
 
@@ -61,87 +66,73 @@ export function UserProvider({
   const [isHydrated, setIsHydrated] =
     useState(false);
 
-  useEffect(() => {
+useEffect(() => {
+  const storedToken = localStorage.getItem("token");
 
-    const storedToken =
-      localStorage.getItem("token");
+  if (!storedToken) {
+    setIsHydrated(true);
+    return;
+  }
 
-    if (storedToken) {
-
-      setToken(storedToken);
-
-      const decoded =
-        jwtDecode<DecodedToken>(
-          storedToken,
-        );
-
-      setUser(decoded);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(decoded),
-      );
-
+  try {
+    if (storedToken.split(".").length !== 3) {
+      throw new Error("Token inválido");
     }
 
-    setIsHydrated(true);
+    setToken(storedToken);
 
-  }, []);
+    const decoded = jwtDecode<DecodedToken>(storedToken);
+    setUser(decoded);
 
-  useEffect(() => {
+    localStorage.setItem("user", JSON.stringify(decoded));
 
-    if (!user?.id) return;
+  } catch (err) {
 
-    socket.connect();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
 
-    socket.emit(
-      "join",
-      user.id,
-    );
+    setToken(null);
+    setUser(null);
+  }
 
-    socket.on(
-      "notification:new",
-      (notification) => {
+  setIsHydrated(true);
+}, []);
 
-        toast.success(
-          notification.message ||
-          "Nueva notificación",
-        );
-      },
-    );
+useEffect(() => {
+  if (!user?.id) return;
 
-    return () => {
+  socket.connect();
+  socket.emit("join", user.id);
 
-      socket.off(
-        "notification:new",
-      );
-    };
+  const handler = (notification: any) => {
+    toast.success(notification.message || "Nueva notificación");
+  };
 
-  }, [user]);
+  socket.on("notification:new", handler);
 
-  const login = (
-    newToken: string,
-  ) => {
+  return () => {
+    socket.off("notification:new", handler);
+    socket.disconnect();
+  };
+}, [user?.id]);
 
-    localStorage.setItem(
-      "token",
-      newToken,
-    );
+const login = (newToken: string) => {
+  try {
+    localStorage.setItem("token", newToken);
+
+    document.cookie = `userSession=${newToken}; path=/; max-age=86400`;
 
     setToken(newToken);
 
-    const decoded =
-      jwtDecode<DecodedToken>(
-        newToken,
-      );
+    const decoded = jwtDecode<DecodedToken>(newToken);
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(decoded),
-    );
+    localStorage.setItem("user", JSON.stringify(decoded));
 
     setUser(decoded);
-  };
+  } catch (error) {
+    toast.error("Token inválido");
+  }
+};
 
   const logout = () => {
 
@@ -152,6 +143,8 @@ export function UserProvider({
     localStorage.removeItem(
       "user",
     );
+
+    document.cookie = "userSession=; path=/; max-age=0";
 
     setToken(null);
 
@@ -174,6 +167,8 @@ export function UserProvider({
 
         isAuthenticated:
           !!token,
+
+        isProfileCompleted: !!user?.profileCompleted,
 
         isHydrated,
 
