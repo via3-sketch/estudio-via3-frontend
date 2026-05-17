@@ -4,6 +4,7 @@ import { DecodedToken } from "./context/UserContext";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -11,25 +12,30 @@ export function middleware(request: NextRequest) {
   ) {
     return NextResponse.next();
   }
+
   if (
     pathname.startsWith("/autenticacion/autenticacion-google") ||
     pathname.startsWith("/auth/google/callback")
   ) {
     return NextResponse.next();
   }
+
   const isPublicRoute =
     pathname === "/" ||
     pathname === "/autenticacion" ||
     pathname === "/contacto" ||
-    pathname.startsWith("/plataforma") ||   
-    pathname.startsWith("/capacitaciones"); 
+    pathname.startsWith("/plataforma") ||
+    pathname.startsWith("/capacitaciones");
+
   const token = request.cookies.get("userSession")?.value;
+
   if (!token) {
     if (isPublicRoute) {
-      return NextResponse.next(); 
+      return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
+
   try {
     const user = jwtDecode<DecodedToken>(token);
     const isCompleteProfilePage = pathname === "/completar-perfil";
@@ -42,7 +48,7 @@ export function middleware(request: NextRequest) {
     }
 
     if (pathname === "/autenticacion" || isCompleteProfilePage) {
-      return NextResponse.redirect(new URL("/admin/requests", request.url)); 
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     return NextResponse.next();
