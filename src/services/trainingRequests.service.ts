@@ -1,11 +1,12 @@
 import { api } from "./api";
 
 export const getTrainingRequests = async (
-  token: string, ...params: string[]
+  token: string,
+  page: number = 1,
+  limit: number = 10
 ) => {
-  return await api(`/training-requests${params ? params.map(p => "?"+p ).join("&") : ""}`, {
+  return await api(`/training-requests?page=${page}&limit=${limit}`, {
     method: "GET",
-
     headers: {
       Authorization: `Bearer ${token}`,
     },
