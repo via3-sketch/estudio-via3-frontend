@@ -6,8 +6,8 @@ import {
 import { api } from "./api";
 
 export const getAllTrainings =
-  (): Promise<TrainingCard[]> => {
-    return api("/trainings", {
+  (...params: string[]): Promise<TrainingCard[]> => {
+    return api(`/trainings${params ? params.map(p => "?"+p ).join("&") : ""}`, {
       method: "GET",
     });
   };
