@@ -2,37 +2,21 @@
 
 import Link from "next/link";
 
-import {
-  usePathname,
-  useRouter,
-} from "next/navigation";
+import { usePathname } from "next/navigation";
+
+import { useUser } from "@/hooks/useUser";
 
 export default function Sidebar() {
-  const pathname =
-    usePathname();
+  const pathname = usePathname();
 
-  const router = useRouter();
+  const { logout } = useUser();
 
-  const linkClass = (
-    path: string,
-  ) =>
+  const linkClass = (path: string) =>
     `block px-3 py-2 rounded-md transition ${
       pathname === path
         ? "bg-[#C7962D]/10 text-[#C7962D]"
         : "text-gray-300 hover:text-[#C7962D] hover:bg-white/5"
     }`;
-
-  const handleLogout = () => {
-    localStorage.removeItem(
-      "token",
-    );
-
-    localStorage.removeItem(
-      "user",
-    );
-
-    router.push("/auth");
-  };
 
   return (
     <aside className="w-64 border-r border-white/10 bg-black/80 p-6 flex flex-col justify-between">
@@ -53,9 +37,7 @@ export default function Sidebar() {
 
           <Link
             href="/admin"
-            className={linkClass(
-              "/admin",
-            )}
+            className={linkClass("/admin")}
           >
             Dashboard
           </Link>
@@ -88,6 +70,15 @@ export default function Sidebar() {
           </Link>
 
           <Link
+            href="/admin/contact"
+            className={linkClass(
+              "/admin/contact",
+            )}
+          >
+            Contacto
+          </Link>
+
+          <Link
             href="/admin/meetings"
             className={linkClass(
               "/admin/meetings",
@@ -116,9 +107,7 @@ export default function Sidebar() {
           </Link>
 
           <button
-            onClick={
-              handleLogout
-            }
+            onClick={logout}
             className="w-full text-left px-3 py-2 rounded-md text-red-400 hover:bg-red-500/10 transition"
           >
             Cerrar sesión
