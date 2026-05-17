@@ -180,12 +180,12 @@ export default function AdminView() {
                   <div className="mt-6 flex items-center gap-4">
                     <Link
                       href={`/admin/services/${training.id}/edit`}
-                      className="text-sm text-[#C7962D] hover:underline"
+                      className="text-sm text-[#C7962D] hover:underline cursor-pointer"
                     >
                       Editar
                     </Link>
 
-                    <button className="text-sm text-red-400 hover:underline">
+                    <button className="text-sm text-red-400 hover:underline cursor-pointer">
                       Eliminar
                     </button>
                   </div>

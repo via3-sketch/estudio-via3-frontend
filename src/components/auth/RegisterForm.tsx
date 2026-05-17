@@ -7,7 +7,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import GoogleButton from "./GoogleButton";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-
 import TermsModal from "./TermsModal";
 import { registerUser, loginUser } from "@/services/auth.service";
 import { registerSchema } from "@/validations/register.validations";
@@ -26,28 +25,54 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    address: "",
+    city: "",
+    phone: "",
+    country: "",
+    companyName: "",
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    const updatedValues = { ...formData, [name]: value };
+    setFormData(updatedValues);
+
+    const result = registerSchema.safeParse(updatedValues);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string;
+        if (!fieldErrors[field]) fieldErrors[field] = issue.message;
+      });
+      setErrors(fieldErrors);
+    } else {
+      setErrors({});
+    }
+  };
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const payload = {
-      name: formData.get("name")?.toString() || "",
-      email: formData.get("email")?.toString() || "",
-      password: formData.get("password")?.toString() || "",
-      confirmPassword: formData.get("confirmPassword")?.toString() || "",
-      address: formData.get("address")?.toString() || "",
-      city: formData.get("city")?.toString() || "",
-      phone: formData.get("phone")?.toString() || "",
-      country: formData.get("country")?.toString() || "",
-      companyName: formData.get("companyName")?.toString() || "",
-    };
+
     if (!acceptedTerms) {
       toast.warning("Debes aceptar los términos y condiciones");
       return;
     }
-    const result = registerSchema.safeParse(payload);
+
+    const result = registerSchema.safeParse(formData);
     if (!result.success) {
-      toast.warning(result.error.issues[0].message);
+      const fieldErrors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string;
+        if (!fieldErrors[field]) fieldErrors[field] = issue.message;
+      });
+      setErrors(fieldErrors);
+      toast.warning("Revisá los campos del formulario");
       return;
     }
 
@@ -60,6 +85,7 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       });
 
       login(loginData.access_token);
+      document.cookie = `userSession=${loginData.access_token}; path=/; max-age=604800; SameSite=Lax`;
       const returnTo = searchParams.get("returnTo");
       const pending = localStorage.getItem("pendingRequest");
 
@@ -68,16 +94,13 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
       } else if (pending) {
         const { trainingId, categoria } = JSON.parse(pending);
         localStorage.removeItem("pendingRequest");
-        router.push(
-          `/solicitudes?categoria=${encodeURIComponent(categoria)}&trainingId=${trainingId}`,
-        );
+        router.push(`/solicitudes?categoria=${encodeURIComponent(categoria)}&trainingId=${trainingId}`);
       } else {
         router.push("/plataforma");
       }
     } catch (err: any) {
       const mensajeBackend = err?.message || "Error al registrarse";
       toast.error(mensajeBackend);
-      // El detalle de UX del compañero
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
@@ -91,11 +114,13 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <Input name="name" type="text" placeholder="Nombre completo" />
+            <Input name="name" type="text" placeholder="Nombre completo" value={formData.name} onChange={handleChange} />
+            {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
           </div>
 
           <div className="col-span-2">
-            <Input name="email" type="email" placeholder="Correo electrónico" />
+            <Input name="email" type="email" placeholder="Correo electrónico" value={formData.email} onChange={handleChange} />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
           </div>
 
           <div className="col-span-2">
@@ -104,6 +129,8 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                 name="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Contraseña"
+                value={formData.password}
+                onChange={handleChange}
               />
               <button
                 type="button"
@@ -114,9 +141,9 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
               </button>
             </div>
             <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-              Mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y
-              carácter especial.
+              Mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y carácter especial.
             </p>
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
           </div>
 
           <div className="col-span-2">
@@ -125,6 +152,8 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
                 name="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Confirmar contraseña"
+                value={formData.confirmPassword}
+                onChange={handleChange}
               />
               <button
                 type="button"
@@ -135,29 +164,29 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
               </button>
             </div>
             <p className="mt-2 text-xs text-gray-500">Repetí la contraseña</p>
+            {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
           </div>
 
           <div>
-            <Input name="address" type="text" placeholder="Dirección" />
-            <p className="mt-2 text-xs text-gray-500">
-              Dirección de la empresa
-            </p>
+            <Input name="address" type="text" placeholder="Dirección" value={formData.address} onChange={handleChange} />
+            <p className="mt-2 text-xs text-gray-500">Dirección de la empresa</p>
+            {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
           </div>
 
           <div>
-            <Input name="phone" type="tel" placeholder="Teléfono" />
+            <Input name="phone" type="tel" placeholder="Teléfono" value={formData.phone} onChange={handleChange} />
             <p className="mt-2 text-xs text-gray-500">Número de contacto</p>
+            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
           </div>
 
           <div>
             <select
               name="country"
-              defaultValue=""
+              value={formData.country}
+              onChange={handleChange}
               className="w-full rounded-xl border border-white/10 bg-[#0D0D0D] px-4 py-3 text-sm text-white outline-none transition focus:border-[#C7962D]"
             >
-              <option value="" disabled>
-                🌍 Seleccionar país
-              </option>
+              <option value="" disabled>🌍 Seleccionar país</option>
               <option value="Argentina">🇦🇷 Argentina</option>
               <option value="Brasil">🇧🇷 Brasil</option>
               <option value="Chile">🇨🇱 Chile</option>
@@ -168,21 +197,20 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
               <option value="Perú">🇵🇪 Perú</option>
               <option value="Uruguay">🇺🇾 Uruguay</option>
             </select>
-            <p className="mt-2 text-xs text-gray-500">
-              País donde opera la empresa
-            </p>
+            <p className="mt-2 text-xs text-gray-500">País donde opera la empresa</p>
+            {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
           </div>
 
           <div>
-            <Input name="city" type="text" placeholder="Ciudad" />
+            <Input name="city" type="text" placeholder="Ciudad" value={formData.city} onChange={handleChange} />
             <p className="mt-2 text-xs text-gray-500">Ciudad principal</p>
+            {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
           </div>
 
           <div className="col-span-2">
-            <Input name="companyName" type="text" placeholder="Empresa" />
-            <p className="mt-2 text-xs text-gray-500">
-              Nombre de la empresa o institución
-            </p>
+            <Input name="companyName" type="text" placeholder="Empresa" value={formData.companyName} onChange={handleChange} />
+            <p className="mt-2 text-xs text-gray-500">Nombre de la empresa o institución</p>
+            {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName}</p>}
           </div>
         </div>
 
