@@ -2,10 +2,7 @@
 
 import { useState } from "react";
 
-import {
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 
@@ -23,6 +20,10 @@ import { useUser } from "@/hooks/useUser";
 
 import { toast } from "sonner";
 
+import { useForm } from "react-hook-form";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+
 type LoginFormProps = {
   onSwitchToRegister: () => void;
 };
@@ -34,103 +35,74 @@ export default function LoginForm({
 
   const { login } = useUser();
 
-  const [
-    showPassword,
-    setShowPassword,
-  ] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (
-    e: any,
-  ) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isValid },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    mode: "onChange",
+  });
 
-    const form = e.currentTarget;
+  const email = watch("email");
+  const password = watch("password");
 
-    const formData = new FormData(
-      e.currentTarget,
-    );
+const isDisabled = !email || !password || !isValid;
 
-    const payload = {
-      email:
-        formData.get("email")?.toString() ||
-        "",
+const onSubmit = async (data: any) => {
+  try {
+    const res = await loginUser(data);
 
-      password:
-        formData
-          .get("password")
-          ?.toString() || "",
-    };
+    login(res.access_token);
 
-    const result =
-      loginSchema.safeParse(payload);
+    toast.success("Login exitoso");
 
-    if (!result.success) {
-      toast.warning(
-        result.error.issues[0].message,
-      );
-
-      return;
-    }
-
-    try {
-      const data =
-        await loginUser(result.data);
-
-      const token =
-        data.access_token;
-
-      login(token);
-
-      toast.success("Login exitoso");
-
-      form.reset();
-       
-      router.push("/");
-
-    } catch (err: any) {
-      toast.error(
-        "Credenciales incorrectas",
-      );
-    }
-  };
+    router.push("/");
+  } catch {
+    toast.error("Credenciales incorrectas");
+  }
+};
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       noValidate
       className="space-y-5"
     >
-
       <GoogleButton />
 
       <div className="text-center text-gray-500">
         o
       </div>
 
-      <Input
-        name="email"
-        type="email"
-        placeholder="Correo electrónico"
-      />
+      <div>
+        <Input
+          type="email"
+          placeholder="Correo electrónico"
+          {...register("email")}
+        />
+
+        {errors.email?.message && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.email.message}
+          </p>
+        )}
+      </div>
 
       <div className="relative">
-
         <Input
-          name="password"
-          type={
-            showPassword
-              ? "text"
-              : "password"
-          }
+          type={showPassword ? "text" : "password"}
           placeholder="Contraseña"
+          {...register("password")}
         />
 
         <button
           type="button"
           onClick={() =>
-            setShowPassword(
-              !showPassword,
-            )
+            setShowPassword(!showPassword)
           }
           className="absolute right-4 top-3 text-gray-400 hover:text-[#C7962D] transition"
         >
@@ -141,35 +113,40 @@ export default function LoginForm({
           )}
         </button>
 
+        {errors.password?.message && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.password.message}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-between text-sm">
-
         <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
-
           <input
             type="checkbox"
             className="accent-[#C7962D]"
           />
-
           Recordarme
-
         </label>
 
         <span className="text-[#C7962D] cursor-pointer hover:underline">
           ¿Olvidaste tu contraseña?
         </span>
-
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button
+        type="submit"
+          className={`w-full transition ${
+    isDisabled
+      && "opacity-20 cursor-not-allowed"
+  }`}
+        disabled={isDisabled}
+      >
         Acceder
       </Button>
 
       <p className="text-sm text-gray-400 text-center">
-
         ¿No tenés cuenta?{" "}
-
         <button
           type="button"
           onClick={onSwitchToRegister}
@@ -177,9 +154,7 @@ export default function LoginForm({
         >
           Registrate
         </button>
-
       </p>
-
     </form>
   );
 }

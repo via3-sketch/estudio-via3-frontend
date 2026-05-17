@@ -48,9 +48,7 @@ export const registerSchema = z
        
     country: z
       .string()
-      .min(1, "El país es obligatorio")
-      .min(2, "El país debe tener mínimo 2 caracteres")
-      .max(50, "El país debe tener máximo 50 caracteres"),
+      .min(1, "El país es obligatorio"),
 
       address: z
       .string()

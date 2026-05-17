@@ -1,25 +1,14 @@
 "use client";
-
-import {
-  useState,
-} from "react";
-
-import {
-  Eye,
-  EyeOff,
-} from "lucide-react";
-
+import {useState} from "react";
+import { Eye, EyeOff} from "lucide-react";
 import GoogleButton from "./GoogleButton";
-
 import Input from "@/components/ui/Input";
-
 import Button from "@/components/ui/Button";
-
 import { registerUser } from "@/services/auth.service";
-
 import { registerSchema } from "@/validations/register.validations";
-
 import { toast } from "sonner";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type RegisterFormProps = {
   onSwitchToLogin: () => void;
@@ -28,113 +17,67 @@ type RegisterFormProps = {
 export default function RegisterForm({
   onSwitchToLogin,
 }: RegisterFormProps) {
-  const [
-    showPassword,
-    setShowPassword,
-  ] = useState(false);
 
+  const [ showPassword, setShowPassword] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [ showConfirmPassword, setShowConfirmPassword] = useState(false);
+const {
+  control,
+  register,
+  handleSubmit,
+  watch,
+  formState: {
+    errors, isValid
+  },
+} = useForm({
+  resolver: zodResolver(registerSchema),
+  mode: "onChange", // 
+});
 
-  const [
-    showConfirmPassword,
-    setShowConfirmPassword,
-  ] = useState(false);
+ const name = watch("name")
+ const email = watch("email");
+ const password = watch("password");
+ const confirmPassword = watch("confirmPassword");
+ const address = watch("address");
+ const phone = watch("phone");
+ const country = watch("country");
+ const city = watch("city");
+ const companyName = watch("companyName");
 
-  const handleSubmit = async (
-    e: any,
-  ) => {
-    e.preventDefault();
+const isDisabled = !name || !email || !password || !confirmPassword || !address || !phone || !country || !city || !companyName || !isValid;
 
-    const form = e.currentTarget;
-
-    const formData = new FormData(
-      form,
+const onSubmit = async (data: any) => {
+  if (!acceptedTerms) {
+    toast.warning(
+      "Debes aceptar los términos y condiciones"
     );
 
-    const payload = {
-      name:
-        formData.get("name")?.toString() ||
-        "",
+    return;
+  }
 
-      email:
-        formData.get("email")?.toString() ||
-        "",
+  try {
+    await registerUser(data);
 
-      password:
-        formData
-          .get("password")
-          ?.toString() || "",
+    toast.success(
+      "Cuenta creada correctamente"
+    );
 
-      confirmPassword:
-        formData
-          .get("confirmPassword")
-          ?.toString() || "",
+    setShowPassword(false);
 
-      address:
-        formData
-          .get("address")
-          ?.toString() || "",
+    setShowConfirmPassword(false);
 
-      city:
-        formData.get("city")?.toString() ||
-        "",
+    onSwitchToLogin();
 
-      phone:
-      
-     formData.get("phone")?.toString() || "",
-      
-
-      country:
-        formData
-          .get("country")
-          ?.toString() || "",
-
-      companyName:
-        formData
-          .get("companyName")
-          ?.toString() || "",
-    };
-
-     if (!acceptedTerms) {
-      toast.warning("Debes aceptar los términos y condiciones");
-      return;
-    }
-
-    const result =
-      registerSchema.safeParse(payload);
-
-    if (!result.success) {
-      toast.warning(
-        result.error.issues[0].message,
-      );
-
-      return;
-    }
-
-    try {
-      await registerUser(result.data);
-
-      form.reset();
-
-      setShowPassword(false);
-
-      setShowConfirmPassword(false);
-
-      toast.success(
-        "Cuenta creada correctamente",
-      );
-
-      onSwitchToLogin();
-
-    } catch (err: any) {
-
-      toast.error("Error al registrarse");
-    }
-  };
+  } catch {
+    toast.error(
+      "Error al registrarse"
+    );
+  }
+};
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       noValidate
       className="space-y-5"
     >
@@ -148,34 +91,54 @@ export default function RegisterForm({
       <div className="grid grid-cols-2 gap-4">
 
         <div className="col-span-2">
-          <Input
-            name="name"
-            type="text"
-            placeholder="Nombre completo"
-          />
-        </div>
+  <Input
+    type="text"
+    placeholder="Nombre completo"
+    {...register("name")}
+  />
+
+  {errors.name && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.name.message as string}
+    </p>
+  )}
+</div>
 
         <div className="col-span-2">
-          <Input
-            name="email"
-            type="email"
-            placeholder="Correo electrónico"
-          />
+      <Input
+    type="email"
+    placeholder="Email"
+    {...register("email")}
+  />
+
+  {errors.email && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.email.message}
+    </p>
+  )}
         </div>
 
         <div className="col-span-2">
 
           <div className="relative">
 
-            <Input
-              name="password"
-              type={
-                showPassword
-                  ? "text"
-                  : "password"
-              }
-              placeholder="Contraseña"
-            />
+<Input
+  type={
+    showPassword
+      ? "text"
+      : "password"
+  }
+  placeholder="Contraseña"
+  {...register("password")}
+/>
+
+{
+  errors.password && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.password.message}
+    </p>
+  )
+}
 
             <button
               type="button"
@@ -212,15 +175,28 @@ export default function RegisterForm({
 
           <div className="relative">
 
-            <Input
-              name="confirmPassword"
-              type={
-                showConfirmPassword
-                  ? "text"
-                  : "password"
-              }
-              placeholder="Confirmar contraseña"
-            />
+      <Input
+  type={
+    showConfirmPassword
+      ? "text"
+      : "password"
+  }
+  placeholder="Confirmar contraseña"
+  {...register(
+    "confirmPassword"
+  )}
+/>
+
+{
+  errors.confirmPassword && (
+    <p className="text-red-500 text-xs mt-1">
+      {
+        errors.confirmPassword
+          .message
+      }
+    </p>
+  )
+}
 
             <button
               type="button"
@@ -251,11 +227,17 @@ export default function RegisterForm({
         </div>
 
         <div>
-          <Input
-            name="address"
-            type="text"
-            placeholder="Dirección"
-          />
+              <Input
+    type="text"
+    placeholder="Dirección"
+    {...register("address")}
+  />
+
+  {errors.address && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.address.message}
+    </p>
+  )}
 
           <p className="mt-2 text-xs text-gray-500">
             Dirección de la empresa
@@ -263,11 +245,17 @@ export default function RegisterForm({
         </div>
 
         <div>
-          <Input
-            name="phone"
-            type="tel"
-            placeholder="Teléfono"
-          />
+       <Input
+    type="tel"
+    placeholder="Teléfono"
+    {...register("phone")}
+  />
+
+  {errors.phone && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.phone.message}
+    </p>
+  )}
 
           <p className="mt-2 text-xs text-gray-500">
             Número de contacto
@@ -276,9 +264,12 @@ export default function RegisterForm({
 
         <div>
 
-          <select
-            name="country"
-            defaultValue=""
+          <Controller
+  control={control}
+  name="country"
+  render={({ field }) => (
+    <select
+      {...field}
             className="
               w-full
               rounded-xl
@@ -296,7 +287,6 @@ export default function RegisterForm({
           >
             <option
               value=""
-              disabled
             >
               🌍 Seleccionar país
             </option>
@@ -330,7 +320,8 @@ export default function RegisterForm({
             </option>
 
           </select>
-
+  )}
+  />
           <p className="mt-2 text-xs text-gray-500">
             País donde opera la
             empresa
@@ -339,11 +330,17 @@ export default function RegisterForm({
         </div>
 
         <div>
-          <Input
-            name="city"
-            type="text"
-            placeholder="Ciudad"
-          />
+             <Input
+    type="text"
+    placeholder="Ciudad"
+    {...register("city")}
+  />
+
+  {errors.city && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.city.message}
+    </p>
+  )}
 
           <p className="mt-2 text-xs text-gray-500">
             Ciudad principal
@@ -351,11 +348,17 @@ export default function RegisterForm({
         </div>
 
         <div className="col-span-2">
-          <Input
-            name="companyName"
-            type="text"
-            placeholder="Empresa"
-          />
+              <Input
+    type="text"
+    placeholder="Nombre de la empresa"
+    {...register("companyName")}
+  />
+
+  {errors.companyName && (
+    <p className="text-red-500 text-xs mt-1">
+      {errors.companyName.message}
+    </p>
+  )}
 
           <p className="mt-2 text-xs text-gray-500">
             Nombre de la empresa o
@@ -391,7 +394,12 @@ export default function RegisterForm({
 
       </div>
 
-      <Button type="submit" className="w-full">
+      <Button type="submit"      
+       className={`w-full transition ${
+    isDisabled
+      && "opacity-20 cursor-not-allowed"
+  }`}
+        disabled={isDisabled}>
         Crear cuenta
       </Button>
 
