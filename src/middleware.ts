@@ -41,8 +41,7 @@ export function middleware(request: NextRequest) {
   if (!token) {
     if (
       isPublicPath ||
-      isAuthPage ||
-      isCompleteProfile
+      isAuthPage 
     ) {
       return NextResponse.next();
     }
@@ -63,6 +62,12 @@ export function middleware(request: NextRequest) {
       }
 
       return NextResponse.next();
+    }
+
+        if (isCompleteProfile) {
+      return NextResponse.redirect(
+        new URL("/", request.url)
+      );
     }
 
     return NextResponse.next();

@@ -1,52 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useForm } from "react-hook-form";
 
-import {toast} from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { toast } from "sonner";
+
+import {
+  contactSchema,
+} from "@/validations/contact.validations";
+
+import { z } from "zod";
+
+import Button from "@/components/ui/Button";
+
+type ContactFormData = z.infer<
+  typeof contactSchema
+>;
 
 export default function ContactoView() {
-  const [form, setForm] = useState({
-    nombre: "",
-    email: "",
-    empresa: "",
-    mensaje: "",
+  const {
+    watch,
+    register,
+    handleSubmit,
+    reset,
+    formState: {
+      errors,
+      isValid,
+    },
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(
+      contactSchema
+    ),
+    mode: "onChange",
   });
 
-  const handleChange = (e: any) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
-  };
+ const name = watch("name");
+ const email = watch("email");
+ const companyName = watch("companyName");
+ const message = watch("message");
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
+const isDisabled = !name || !email || !companyName || !message || !isValid;
 
-    const stored = localStorage.getItem("contacto");
-    const mensajes = stored ? JSON.parse(stored) : [];
+  const onSubmit = (
+    data: ContactFormData
+  ) => {
+    const stored =
+      localStorage.getItem("contacto");
+
+    const mensajes = stored
+      ? JSON.parse(stored)
+      : [];
 
     const nuevoMensaje = {
       id: Date.now(),
-      ...form,
+      ...data,
       fecha: new Date().toLocaleDateString(),
     };
 
-  
     localStorage.setItem(
       "contacto",
-      JSON.stringify([nuevoMensaje, ...mensajes])
+      JSON.stringify([
+        nuevoMensaje,
+        ...mensajes,
+      ])
     );
 
+    toast.success(
+      "Mensaje enviado correctamente"
+    );
 
-  
-    toast.success("Mensaje enviado correctamente");
-
-    setForm({
-      nombre: "",
-      email: "",
-      empresa: "",
-      mensaje: "",
-    });
+    reset();
   };
 
   return (
@@ -61,47 +85,80 @@ export default function ContactoView() {
           Dejanos tu consulta y te responderemos a la brevedad.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
 
-          <input
-            name="nombre"
-            placeholder="Nombre"
-            value={form.nombre}
-            onChange={handleChange}
-            required
-            className="w-full p-3 bg-white/5 border border-white/10 rounded"
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Nombre"
+              {...register("name")}
+              className="w-full p-3 bg-white/5 border border-white/10 rounded"
+            />
 
-          <input
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full p-3 bg-white/5 border border-white/10 rounded"
-          />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.name.message}
+              </p>
+            )}
+          </div>
 
-          <input
-            name="empresa"
-            placeholder="Empresa"
-            value={form.empresa}
-            onChange={handleChange}
-            className="w-full p-3 bg-white/5 border border-white/10 rounded"
-          />
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              {...register("email")}
+              className="w-full p-3 bg-white/5 border border-white/10 rounded"
+            />
 
-          <textarea
-            name="mensaje"
-            placeholder="Mensaje"
-            value={form.mensaje}
-            onChange={handleChange}
-            required
-            className="w-full p-3 bg-white/5 border border-white/10 rounded"
-          />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
 
-          <button className="cursor-pointer w-full py-3 bg-[#C7962D] text-black font-semibold rounded hover:opacity-90 transition">
-            Enviar mensaje
-          </button>
+          <div>
+            <input
+              type="text"
+              placeholder="Empresa"
+              {...register("companyName")}
+              className="w-full p-3 bg-white/5 border border-white/10 rounded"
+            />
 
+            {errors.companyName && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.companyName.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <textarea
+              placeholder="Mensaje"
+              {...register("message")}
+              className="w-full p-3 bg-white/5 border border-white/10 rounded min-h-[140px]"
+            />
+
+            {errors.message && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.message.message}
+              </p>
+            )}
+          </div>
+
+     <Button
+        type="submit"
+          className={`w-full transition ${
+    isDisabled
+      && "opacity-20 cursor-not-allowed"
+  }`}
+        disabled={isDisabled}
+      >
+        Enviar mensaje
+      </Button>
         </form>
       </div>
     </div>
