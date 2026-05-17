@@ -1,80 +1,129 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, {
+  useState,
+} from "react";
 
 import { toast } from "sonner";
 
-import {
-  contactSchema,
-} from "@/validations/contact.validations";
+import { contactSchema } from "@/validations/contactValidator";
 
-import { z } from "zod";
-
-import Button from "@/components/ui/Button";
-
-type ContactFormData = z.infer<
-  typeof contactSchema
->;
+import { sendContactMessage } from "@/services/contact.service";
 
 export default function ContactoView() {
-  const {
-    watch,
-    register,
-    handleSubmit,
-    reset,
-    formState: {
-      errors,
-      isValid,
-    },
-  } = useForm<ContactFormData>({
-    resolver: zodResolver(
-      contactSchema
-    ),
-    mode: "onChange",
-  });
+  const [form, setForm] =
+    useState({
+      nombre: "",
+      email: "",
+      empresa: "",
+      mensaje: "",
+    });
 
- const name = watch("name");
- const email = watch("email");
- const companyName = watch("companyName");
- const message = watch("message");
+  const [errors, setErrors] =
+    useState<Record<string, string>>(
+      {},
+    );
 
-const isDisabled = !name || !email || !companyName || !message || !isValid;
+  const [loading, setLoading] =
+    useState(false);
 
-  const onSubmit = (
-    data: ContactFormData
+  const validateForm = (
+    values: typeof form,
   ) => {
-    const stored =
-      localStorage.getItem("contacto");
+    const result =
+      contactSchema.safeParse(
+        values,
+      );
 
-    const mensajes = stored
-      ? JSON.parse(stored)
-      : [];
+    if (!result.success) {
+      const fieldErrors: Record<
+        string,
+        string
+      > = {};
 
-    const nuevoMensaje = {
-      id: Date.now(),
-      ...data,
-      fecha: new Date().toLocaleDateString(),
+      result.error.issues.forEach(
+        (issue) => {
+          const field =
+            issue.path[0] as string;
+
+          fieldErrors[field] =
+            issue.message;
+        },
+      );
+
+      setErrors(fieldErrors);
+
+      return false;
+    }
+
+    setErrors({});
+
+    return true;
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement
+    >,
+  ) => {
+    const { name, value } =
+      e.target;
+
+    const updatedValues = {
+      ...form,
+      [name]: value,
     };
 
-    localStorage.setItem(
-      "contacto",
-      JSON.stringify([
-        nuevoMensaje,
-        ...mensajes,
-      ])
-    );
+    setForm(updatedValues);
 
-    toast.success(
-      "Mensaje enviado correctamente"
-    );
+    validateForm(updatedValues);
+  };
 
-    reset();
+  const handleSubmit = async (
+    e: React.FormEvent,
+  ) => {
+    e.preventDefault();
+
+    const isValid =
+      validateForm(form);
+
+    if (!isValid) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await sendContactMessage(
+        form,
+      );
+
+      toast.success(
+        "Tu consulta fue enviada correctamente. Nuestro equipo revisará tu mensaje y se pondrá en contacto con vos.",
+      );
+
+      setForm({
+        nombre: "",
+        email: "",
+        empresa: "",
+        mensaje: "",
+      });
+
+      setErrors({});
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        "No pudimos enviar tu consulta. Intentá nuevamente en unos minutos.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="bg-[#070707] text-white px-6 pt-32 pb-24 min-h-screen">
+
       <div className="mx-auto max-w-2xl">
 
         <h1 className="text-3xl font-semibold mb-6">
@@ -86,81 +135,164 @@ const isDisabled = !name || !email || !companyName || !message || !isValid;
         </p>
 
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit}
           className="space-y-6"
         >
 
-          <div>
+          <div className="space-y-2">
+
             <input
-              type="text"
+              name="nombre"
               placeholder="Nombre"
-              {...register("name")}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded"
+              value={form.nombre}
+              onChange={handleChange}
+              className={`
+                w-full
+                p-3
+                bg-white/5
+                border
+                rounded
+                outline-none
+                transition
+
+                ${
+                  errors.nombre
+                    ? "border-red-500"
+                    : "border-white/10 focus:border-[#C7962D]"
+                }
+              `}
             />
 
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.name.message}
+            {errors.nombre && (
+              <p className="text-sm text-red-400">
+                {errors.nombre}
               </p>
             )}
+
           </div>
 
-          <div>
+          <div className="space-y-2">
+
             <input
-              type="email"
+              name="email"
               placeholder="Email"
-              {...register("email")}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded"
+              value={form.email}
+              onChange={handleChange}
+              className={`
+                w-full
+                p-3
+                bg-white/5
+                border
+                rounded
+                outline-none
+                transition
+
+                ${
+                  errors.email
+                    ? "border-red-500"
+                    : "border-white/10 focus:border-[#C7962D]"
+                }
+              `}
             />
 
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
+              <p className="text-sm text-red-400">
+                {errors.email}
               </p>
             )}
+
           </div>
 
-          <div>
+          <div className="space-y-2">
+
             <input
-              type="text"
+              name="empresa"
               placeholder="Empresa"
-              {...register("companyName")}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded"
+              value={form.empresa}
+              onChange={handleChange}
+              className={`
+                w-full
+                p-3
+                bg-white/5
+                border
+                rounded
+                outline-none
+                transition
+
+                ${
+                  errors.empresa
+                    ? "border-red-500"
+                    : "border-white/10 focus:border-[#C7962D]"
+                }
+              `}
             />
 
-            {errors.companyName && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.companyName.message}
+            {errors.empresa && (
+              <p className="text-sm text-red-400">
+                {errors.empresa}
               </p>
             )}
+
           </div>
 
-          <div>
+          <div className="space-y-2">
+
             <textarea
+              name="mensaje"
               placeholder="Mensaje"
-              {...register("message")}
-              className="w-full p-3 bg-white/5 border border-white/10 rounded min-h-[140px]"
+              value={form.mensaje}
+              onChange={handleChange}
+              rows={6}
+              className={`
+                w-full
+                p-3
+                bg-white/5
+                border
+                rounded
+                outline-none
+                resize-none
+                transition
+
+                ${
+                  errors.mensaje
+                    ? "border-red-500"
+                    : "border-white/10 focus:border-[#C7962D]"
+                }
+              `}
             />
 
-            {errors.message && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.message.message}
+            {errors.mensaje && (
+              <p className="text-sm text-red-400">
+                {errors.mensaje}
               </p>
             )}
+
           </div>
 
-     <Button
-        type="submit"
-          className={`w-full transition ${
-    isDisabled
-      && "opacity-20 cursor-not-allowed"
-  }`}
-        disabled={isDisabled}
-      >
-        Enviar mensaje
-      </Button>
+          <button
+            disabled={loading}
+            className="
+              cursor-pointer
+              w-full
+              py-3
+              bg-[#C7962D]
+              text-black
+              font-semibold
+              rounded
+              hover:opacity-90
+              transition
+              disabled:opacity-50
+            "
+          >
+            {loading
+              ? "Enviando consulta..."
+              : "Enviar mensaje"}
+          </button>
+
         </form>
+
       </div>
+
     </div>
   );
 }

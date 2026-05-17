@@ -68,10 +68,10 @@ export default function AdminView() {
             users: users.length,
 
             requests:
-              requests.length,
+              requests.filter((r: any) => r.status == "confirmed").length,
 
             trainings:
-              trainingsData.length,
+              requests.filter((req: any) => req.status != "confirmed").length,
           });
 
           setTrainings(

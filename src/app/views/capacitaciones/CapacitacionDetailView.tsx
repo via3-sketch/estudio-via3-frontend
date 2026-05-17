@@ -1,28 +1,23 @@
 import Link from "next/link";
-
 import { getTrainingById } from "@/services/training.service";
+import SolicitarButton from "@/components/capacitaciones/SolicitarButton";
 
 interface Props {
   id: string;
 }
 
-export default async function CapacitacionDetailView({
-  id,
-}: Props) {
+export default async function CapacitacionDetailView({ id }: Props) {
   const training = await getTrainingById(id);
 
   if (!training) {
     return (
-      <div className="text-white p-10">
-        No encontramos esta capacitación
-      </div>
+      <div className="text-white p-10">No encontramos esta capacitación</div>
     );
   }
 
   return (
     <div className="bg-[#070707] text-white px-6 pt-28 pb-24 min-h-screen">
       <div className="mx-auto max-w-5xl">
-
         <img
           src={training.fileResource.fileUrl}
           alt={training.title}
@@ -48,29 +43,19 @@ export default async function CapacitacionDetailView({
 
           <ul className="space-y-4 text-gray-300">
             {training.includes.map((item, index) => (
-              <li
-                key={index}
-                className="flex items-start gap-3"
-              >
-                <span className="text-[#C7962D] text-lg">
-                  ✔
-                </span>
+              <li key={index} className="flex items-start gap-3">
+                <span className="text-[#C7962D] text-lg">✔</span>
 
-                <span className="text-base md:text-lg">
-                  {item}
-                </span>
+                <span className="text-base md:text-lg">{item}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <Link
-          href={`/solicitudes?categoria=${training.title}&trainingId=${training.id}`}
-          className="inline-flex items-center justify-center px-8 py-4 bg-[#C7962D] text-black rounded-xl font-semibold hover:opacity-90 transition hover:scale-[1.02]"
-        >
-          Solicitar capacitación
-        </Link>
-
+        <SolicitarButton
+          trainingTitle={training.title}
+          trainingId={training.id}
+        />
       </div>
     </div>
   );

@@ -5,16 +5,6 @@ import { DecodedToken } from "./context/UserContext";
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const token = request.cookies.get("userSession")?.value;
-
-  const isGoogleAuth =
-    pathname.startsWith("/autenticacion/autenticacion-google") ||
-    pathname.startsWith("/auth/google/callback");
-
-  if (isGoogleAuth) {
-    return NextResponse.next();
-  }
-
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
@@ -23,62 +13,46 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const publicPaths = [
-    "/",
-    "/plataforma",
-    "/contacto",
-  ];
+  if (
+    pathname.startsWith("/autenticacion/autenticacion-google") ||
+    pathname.startsWith("/auth/google/callback")
+  ) {
+    return NextResponse.next();
+  }
 
-  const isPublicPath = publicPaths.some(
-    (path) =>
-      pathname === path || pathname.startsWith(path + "/")
-  );
+  const isPublicRoute =
+    pathname === "/" ||
+    pathname === "/autenticacion" ||
+    pathname === "/contacto" ||
+    pathname.startsWith("/plataforma") ||
+    pathname.startsWith("/capacitaciones");
 
-  const isAuthPage = pathname === "/autenticacion";
-  const isCompleteProfile =
-    pathname === "/completar-perfil";
+  const token = request.cookies.get("userSession")?.value;
 
   if (!token) {
-    if (
-      isPublicPath ||
-      isAuthPage 
-    ) {
+    if (isPublicRoute) {
       return NextResponse.next();
     }
-
-    return NextResponse.redirect(
-      new URL("/autenticacion", request.url)
-    );
+    return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
 
   try {
     const user = jwtDecode<DecodedToken>(token);
+    const isCompleteProfilePage = pathname === "/completar-perfil";
 
     if (!user.profileCompleted) {
-      if (!isCompleteProfile) {
-        return NextResponse.redirect(
-          new URL("/completar-perfil", request.url)
-        );
+      if (!isCompleteProfilePage) {
+        return NextResponse.redirect(new URL("/completar-perfil", request.url));
       }
-
       return NextResponse.next();
     }
 
-        if (isCompleteProfile) {
-      return NextResponse.redirect(
-        new URL("/", request.url)
-      );
+    if (pathname === "/autenticacion" || isCompleteProfilePage) {
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     return NextResponse.next();
-
   } catch {
-    const response = NextResponse.redirect(
-      new URL("/autenticacion", request.url)
-    );
-
-      response.cookies.delete("userSession");
-
-  return response;
+    return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
 }

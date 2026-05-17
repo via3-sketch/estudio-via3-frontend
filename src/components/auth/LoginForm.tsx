@@ -1,40 +1,28 @@
 "use client";
 
 import { useState } from "react";
-
 import { Eye, EyeOff } from "lucide-react";
-
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import GoogleButton from "./GoogleButton";
-
 import Input from "@/components/ui/Input";
-
 import Button from "@/components/ui/Button";
 
 import { loginUser } from "@/services/auth.service";
-
 import { loginSchema } from "@/validations/login.validations";
-
 import { useUser } from "@/hooks/useUser";
-
 import { toast } from "sonner";
-
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type LoginFormProps = {
   onSwitchToRegister: () => void;
 };
 
-export default function LoginForm({
-  onSwitchToRegister,
-}: LoginFormProps) {
+export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const router = useRouter();
-
+  const searchParams = useSearchParams();
   const { login } = useUser();
-
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -49,34 +37,39 @@ export default function LoginForm({
 
   const email = watch("email");
   const password = watch("password");
+  const isDisabled = !email || !password || !isValid;
 
-const isDisabled = !email || !password || !isValid;
+  const onSubmit = async (data: any) => {
+    try {
+      const res = await loginUser(data);
+      const token = res.access_token;
 
-const onSubmit = async (data: any) => {
-  try {
-    const res = await loginUser(data);
+      login(token);
+      toast.success("Login exitoso");
+      document.cookie = `userSession=${token}; path=/; max-age=604800; SameSite=Lax`;
 
-    login(res.access_token);
+      const returnTo = searchParams.get("returnTo");
+      const pending = localStorage.getItem("pendingRequest");
 
-    toast.success("Login exitoso");
-
-    router.push("/");
-  } catch {
-    toast.error("Credenciales incorrectas");
-  }
-};
+      if (returnTo) {
+        router.push(returnTo);
+      } else if (pending) {
+        const { trainingId, categoria } = JSON.parse(pending);
+        localStorage.removeItem("pendingRequest");
+        router.push(`/solicitudes?categoria=${encodeURIComponent(categoria)}&trainingId=${trainingId}`);
+      } else {
+        router.push("/");
+      }
+    } catch {
+      toast.error("Credenciales incorrectas");
+    }
+  };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
       <GoogleButton />
 
-      <div className="text-center text-gray-500">
-        o
-      </div>
+      <div className="text-center text-gray-500">o</div>
 
       <div>
         <Input
@@ -84,10 +77,9 @@ const onSubmit = async (data: any) => {
           placeholder="Correo electrónico"
           {...register("email")}
         />
-
         {errors.email?.message && (
           <p className="text-red-500 text-xs mt-1">
-            {errors.email.message}
+            {String(errors.email.message)}
           </p>
         )}
       </div>
@@ -98,37 +90,25 @@ const onSubmit = async (data: any) => {
           placeholder="Contraseña"
           {...register("password")}
         />
-
         <button
           type="button"
-          onClick={() =>
-            setShowPassword(!showPassword)
-          }
-          className="absolute right-4 top-3 text-gray-400 hover:text-[#C7962D] transition"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-3 text-gray-400 hover:text-[#C7962D] transition cursor-pointer"
         >
-          {showPassword ? (
-            <EyeOff size={18} />
-          ) : (
-            <Eye size={18} />
-          )}
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
-
         {errors.password?.message && (
           <p className="text-red-500 text-xs mt-1">
-            {errors.password.message}
+            {String(errors.password.message)}
           </p>
         )}
       </div>
 
       <div className="flex items-center justify-between text-sm">
         <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
-          <input
-            type="checkbox"
-            className="accent-[#C7962D]"
-          />
+          <input type="checkbox" className="accent-[#C7962D]" />
           Recordarme
         </label>
-
         <span className="text-[#C7962D] cursor-pointer hover:underline">
           ¿Olvidaste tu contraseña?
         </span>
@@ -136,10 +116,7 @@ const onSubmit = async (data: any) => {
 
       <Button
         type="submit"
-          className={`w-full transition ${
-    isDisabled
-      && "opacity-20 cursor-not-allowed"
-  }`}
+        className={`w-full transition ${isDisabled && "opacity-20 cursor-not-allowed"}`}
         disabled={isDisabled}
       >
         Acceder

@@ -8,6 +8,8 @@ import { createMeeting } from "@/services/meetings.service";
 
 import { useUser } from "@/hooks/useUser";
 
+import { meetingSchema } from "@/validations/meeting.validations";
+
 type AgendaViewProps = {
   id: string;
 };
@@ -28,14 +30,26 @@ export default function AgendaView({
       horario: "",
     });
 
+  const [errors, setErrors] = useState<any>({});
+
   const handleChange = (
     e: any,
   ) => {
-    setForm({
+    const updatedForm = {
       ...form,
       [e.target.name]:
         e.target.value,
-    });
+    };
+
+    setForm(updatedForm)
+
+    const resultado = meetingSchema.safeParse(updatedForm);
+
+    if (!resultado.success) {
+      setErrors(resultado.error.format());
+    } else {
+      setErrors({});
+    }
   };
 
   const handleSubmit =
@@ -122,6 +136,11 @@ export default function AgendaView({
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
             />
 
+            {errors.fecha?._errors?.[0] && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.fecha._errors[0]}
+              </p>
+            )}
           </div>
 
           <div>
@@ -133,6 +152,8 @@ export default function AgendaView({
             <input
               type="time"
               name="horario"
+              min="09:00"
+              max="17:00"
               onChange={
                 handleChange
               }
@@ -140,6 +161,11 @@ export default function AgendaView({
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
             />
 
+            {errors.horario?._errors?.[0] && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.horario._errors[0]}
+              </p>
+            )}
           </div>
 
           <button

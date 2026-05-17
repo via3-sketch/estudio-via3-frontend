@@ -17,8 +17,20 @@ import {
   updateTraining,
 } from "@/services/training.service";
 
+import { serviceSchema } from "@/validations/serviceValidator";
+
 type Props = {
   id: string;
+};
+
+type ServiceFormValues = {
+  title: string;
+  shortDescription: string;
+  description: string;
+  tagline: string;
+  category: string;
+  includes: string[];
+  file: File | null;
 };
 
 export default function EditServiceView({
@@ -61,6 +73,121 @@ export default function EditServiceView({
 
   const [file, setFile] =
     useState<File | null>(null);
+
+  const [errors, setErrors] =
+    useState<Record<string, string>>(
+      {
+        title: "",
+        shortDescription: "",
+        description: "",
+        tagline: "",
+        category: "",
+        includes: "",
+        file: "",
+      },
+    );
+
+  const getCurrentValues =
+    (): ServiceFormValues => ({
+      title,
+      shortDescription,
+      description,
+      tagline,
+      category,
+      includes,
+      file,
+    });
+
+  const getFieldErrors = (
+    values: ServiceFormValues,
+  ): Record<string, string> => {
+
+    const result =
+      serviceSchema.safeParse(
+        values,
+      );
+
+    if (result.success) {
+
+      return {
+        title: "",
+        shortDescription: "",
+        description: "",
+        tagline: "",
+        category: "",
+        includes: "",
+        file: "",
+      };
+    }
+
+    const formatted =
+      result.error.format();
+
+    return {
+      title:
+        formatted.title?._errors?.[0] ??
+        "",
+
+      shortDescription:
+        formatted
+          .shortDescription
+          ?._errors?.[0] ??
+        "",
+
+      description:
+        formatted
+          .description
+          ?._errors?.[0] ??
+        "",
+
+      tagline:
+        formatted
+          .tagline
+          ?._errors?.[0] ??
+        "",
+
+      category:
+        formatted
+          .category
+          ?._errors?.[0] ??
+        "",
+
+      includes:
+        formatted
+          .includes
+          ?._errors?.[0] ??
+        "",
+
+      file:
+        formatted.file
+          ?._errors?.[0] ??
+        "",
+    };
+  };
+
+  const validateField = (
+    field: keyof Record<
+      string,
+      string
+    >,
+    values: ServiceFormValues,
+  ) => {
+
+    const fieldErrors =
+      getFieldErrors(values);
+
+    setErrors(fieldErrors);
+
+    if (fieldErrors[field]) {
+
+      toast.error(
+        fieldErrors[field],
+        {
+          id: `service-${field}`,
+        },
+      );
+    }
+  };
 
   useEffect(() => {
 
@@ -124,12 +251,33 @@ export default function EditServiceView({
 
       if (
         !includeInput.trim()
-      ) return;
+      ) {
 
-      setIncludes((prev) => [
-        ...prev,
-        includeInput,
-      ]);
+        toast.error(
+          "Debes escribir un include",
+        );
+
+        return;
+      }
+
+      const updatedIncludes =
+        [
+          ...includes,
+          includeInput.trim(),
+        ];
+
+      setIncludes(
+        updatedIncludes,
+      );
+
+      validateField(
+        "includes",
+        {
+          ...getCurrentValues(),
+          includes:
+            updatedIncludes,
+        },
+      );
 
       setIncludeInput("");
     };
@@ -139,11 +287,23 @@ export default function EditServiceView({
       index: number,
     ) => {
 
-      setIncludes((prev) =>
-        prev.filter(
+      const updatedIncludes =
+        includes.filter(
           (_, i) =>
             i !== index,
-        ),
+        );
+
+      setIncludes(
+        updatedIncludes,
+      );
+
+      validateField(
+        "includes",
+        {
+          ...getCurrentValues(),
+          includes:
+            updatedIncludes,
+        },
       );
     };
 
@@ -152,6 +312,38 @@ export default function EditServiceView({
   ) => {
 
     e.preventDefault();
+
+    const values =
+      getCurrentValues();
+
+    const validation =
+      serviceSchema.safeParse(
+        values,
+      );
+
+    if (!validation.success) {
+
+      const fieldErrors =
+        getFieldErrors(
+          values,
+        );
+
+      setErrors(
+        fieldErrors,
+      );
+
+      const firstError =
+        Object.values(
+          fieldErrors,
+        ).find(Boolean);
+
+      toast.error(
+        firstError ||
+          "Revisá los campos del formulario",
+      );
+
+      return;
+    }
 
     try {
 
@@ -247,6 +439,15 @@ export default function EditServiceView({
     }
   };
 
+  const inputClass = (
+    field: string,
+  ) =>
+    `w-full rounded-xl border bg-black p-3 text-white outline-none focus:border-[#C7962D] ${
+      errors[field]
+        ? "border-red-500"
+        : "border-white/10"
+    }`;
+
   if (loading) {
 
     return (
@@ -295,13 +496,31 @@ export default function EditServiceView({
             <input
               type="text"
               value={title}
-              onChange={(e) =>
-                setTitle(
-                  e.target.value,
-                )
-              }
-              className="w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
+              onChange={(e) => {
+
+                const value =
+                  e.target.value;
+
+                setTitle(value);
+
+                validateField(
+                  "title",
+                  {
+                    ...getCurrentValues(),
+                    title: value,
+                  },
+                );
+              }}
+              className={inputClass(
+                "title",
+              )}
             />
+
+            {errors.title && (
+              <p className="text-sm text-red-400">
+                {errors.title}
+              </p>
+            )}
 
           </div>
 
@@ -316,13 +535,36 @@ export default function EditServiceView({
               value={
                 shortDescription
               }
-              onChange={(e) =>
+              onChange={(e) => {
+
+                const value =
+                  e.target.value;
+
                 setShortDescription(
-                  e.target.value,
-                )
-              }
-              className="w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
+                  value,
+                );
+
+                validateField(
+                  "shortDescription",
+                  {
+                    ...getCurrentValues(),
+                    shortDescription:
+                      value,
+                  },
+                );
+              }}
+              className={inputClass(
+                "shortDescription",
+              )}
             />
+
+            {errors.shortDescription && (
+              <p className="text-sm text-red-400">
+                {
+                  errors.shortDescription
+                }
+              </p>
+            )}
 
           </div>
 
@@ -334,13 +576,34 @@ export default function EditServiceView({
 
             <textarea
               value={description}
-              onChange={(e) =>
+              onChange={(e) => {
+
+                const value =
+                  e.target.value;
+
                 setDescription(
-                  e.target.value,
-                )
-              }
-              className="min-h-35 w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
+                  value,
+                );
+
+                validateField(
+                  "description",
+                  {
+                    ...getCurrentValues(),
+                    description:
+                      value,
+                  },
+                );
+              }}
+              className={`${inputClass(
+                "description",
+              )} min-h-35`}
             />
+
+            {errors.description && (
+              <p className="text-sm text-red-400">
+                {errors.description}
+              </p>
+            )}
 
           </div>
 
@@ -353,13 +616,34 @@ export default function EditServiceView({
             <input
               type="text"
               value={tagline}
-              onChange={(e) =>
+              onChange={(e) => {
+
+                const value =
+                  e.target.value;
+
                 setTagline(
-                  e.target.value,
-                )
-              }
-              className="w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
+                  value,
+                );
+
+                validateField(
+                  "tagline",
+                  {
+                    ...getCurrentValues(),
+                    tagline:
+                      value,
+                  },
+                );
+              }}
+              className={inputClass(
+                "tagline",
+              )}
             />
+
+            {errors.tagline && (
+              <p className="text-sm text-red-400">
+                {errors.tagline}
+              </p>
+            )}
 
           </div>
 
@@ -372,13 +656,34 @@ export default function EditServiceView({
             <input
               type="text"
               value={category}
-              onChange={(e) =>
+              onChange={(e) => {
+
+                const value =
+                  e.target.value;
+
                 setCategory(
-                  e.target.value,
-                )
-              }
-              className="w-full rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
+                  value,
+                );
+
+                validateField(
+                  "category",
+                  {
+                    ...getCurrentValues(),
+                    category:
+                      value,
+                  },
+                );
+              }}
+              className={inputClass(
+                "category",
+              )}
             />
+
+            {errors.category && (
+              <p className="text-sm text-red-400">
+                {errors.category}
+              </p>
+            )}
 
           </div>
 
@@ -400,7 +705,9 @@ export default function EditServiceView({
                     e.target.value,
                   )
                 }
-                className="flex-1 rounded-xl border border-white/10 bg-black p-3 text-white outline-none focus:border-[#C7962D]"
+                className={inputClass(
+                  "includes",
+                )}
               />
 
               <button
@@ -414,6 +721,12 @@ export default function EditServiceView({
               </button>
 
             </div>
+
+            {errors.includes && (
+              <p className="text-sm text-red-400">
+                {errors.includes}
+              </p>
+            )}
 
             <div className="flex flex-wrap gap-2">
 
@@ -460,15 +773,35 @@ export default function EditServiceView({
             <input
               type="file"
               accept=".png,.jpg,.jpeg,.webp"
-              onChange={(e) =>
+              onChange={(e) => {
+
+                const selectedFile =
+                  e.target.files?.[0] ??
+                  null;
+
                 setFile(
-                  e.target
-                    .files?.[0] ??
-                    null,
-                )
-              }
-              className="w-full rounded-xl border border-white/10 bg-black p-3 text-gray-300"
+                  selectedFile,
+                );
+
+                validateField(
+                  "file",
+                  {
+                    ...getCurrentValues(),
+                    file:
+                      selectedFile,
+                  },
+                );
+              }}
+              className={inputClass(
+                "file",
+              )}
             />
+
+            {errors.file && (
+              <p className="text-sm text-red-400">
+                {errors.file}
+              </p>
+            )}
 
           </div>
 
