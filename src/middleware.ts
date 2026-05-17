@@ -8,8 +8,8 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("userSession")?.value;
 
   const isGoogleAuth =
-  pathname.startsWith("/autenticacion/autenticacion-google") ||
-  pathname.startsWith("/auth/google/callback");
+    pathname.startsWith("/autenticacion/autenticacion-google") ||
+    pathname.startsWith("/auth/google/callback");
 
   if (isGoogleAuth) {
     return NextResponse.next();
@@ -23,14 +23,30 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const isAuthPage = pathname === "/autenticacion";
-  const isCompleteProfile = pathname === "/completar-perfil";
+  const publicPaths = [
+    "/",
+    "/plataforma",
+    "/contacto",
+  ];
 
-  if (isAuthPage || isCompleteProfile) {
-    return NextResponse.next();
-  }
+  const isPublicPath = publicPaths.some(
+    (path) =>
+      pathname === path || pathname.startsWith(path + "/")
+  );
+
+  const isAuthPage = pathname === "/autenticacion";
+  const isCompleteProfile =
+    pathname === "/completar-perfil";
 
   if (!token) {
+    if (
+      isPublicPath ||
+      isAuthPage ||
+      isCompleteProfile
+    ) {
+      return NextResponse.next();
+    }
+
     return NextResponse.redirect(
       new URL("/autenticacion", request.url)
     );
@@ -45,6 +61,8 @@ export function middleware(request: NextRequest) {
           new URL("/completar-perfil", request.url)
         );
       }
+
+      return NextResponse.next();
     }
 
     return NextResponse.next();

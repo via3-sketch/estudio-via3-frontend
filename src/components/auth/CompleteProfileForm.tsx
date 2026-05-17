@@ -2,8 +2,6 @@
 
 import { useRouter } from "next/navigation";
 
-import { jwtDecode } from "jwt-decode";
-
 import Input from "@/components/ui/Input";
 
 import Button from "@/components/ui/Button";
@@ -12,16 +10,6 @@ import { completeProfile } from "@/services/auth.service";
 
 import { toast } from "sonner";
 
-type DecodedToken = {
-  id: string;
-
-  email: string;
-
-  role: string;
-
-  profileCompleted: boolean;
-};
-
 export default function CompleteProfileForm() {
   const router = useRouter();
 
@@ -29,16 +17,6 @@ export default function CompleteProfileForm() {
     e: any,
   ) => {
     e.preventDefault();
-
-    const token =
-      localStorage.getItem("token");
-
-    if (!token) {
-      return;
-    }
-
-    const decoded =
-      jwtDecode<DecodedToken>(token);
 
     const form =
       e.currentTarget;
@@ -76,11 +54,12 @@ export default function CompleteProfileForm() {
 
     try {
       const res = await completeProfile(
-        decoded.id,
         payload,
       );
 
       localStorage.setItem("token", res.access_token);
+
+      document.cookie = `userSession=${res.access_token}; path=/`;
 
       toast.success(
         "Perfil completado",
