@@ -8,8 +8,8 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get("userSession")?.value;
 
   const isGoogleAuth =
-  pathname.startsWith("/autenticacion/autenticacion-google") ||
-  pathname.startsWith("/auth/google/callback");
+    pathname.startsWith("/autenticacion/autenticacion-google") ||
+    pathname.startsWith("/auth/google/callback");
 
   if (isGoogleAuth) {
     return NextResponse.next();
@@ -31,9 +31,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (!token) {
-    return NextResponse.redirect(
-      new URL("/autenticacion", request.url)
-    );
+    return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
 
   try {
@@ -41,17 +39,12 @@ export function middleware(request: NextRequest) {
 
     if (!user.profileCompleted) {
       if (!isCompleteProfile) {
-        return NextResponse.redirect(
-          new URL("/completar-perfil", request.url)
-        );
+        return NextResponse.redirect(new URL("/completar-perfil", request.url));
       }
     }
 
     return NextResponse.next();
-
   } catch {
-    return NextResponse.redirect(
-      new URL("/autenticacion", request.url)
-    );
+    return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
 }
