@@ -224,46 +224,31 @@ export default function RequestsView() {
                         : "Esperando pago"}
                     </span>
 
-                    <select
+<select
                       value={req.status}
-                      disabled={
-                        req.status ===
-                          "scheduled" ||
-                        req.status ===
-                          "cancelled"
-                      }
+                      // 1. Solo bloqueamos el menú entero si ya está Cancelada (Regla del Back)
+                      disabled={req.status === "cancelled"}
                       onChange={(e) =>
                         handleStatusChange(
                           req.id,
-                          e.target
-                            .value as Request["status"],
+                          e.target.value as Request["status"],
                         )
                       }
-                      className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300"
+                      className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300 cursor-pointer disabled:opacity-50"
                     >
+                      {/* 2. Regla del Back: No puede regresar a Pendiente */}
                       <option
                         value="pending"
-                        disabled={
-                          req.status !==
-                          "pending"
-                        }
+                        disabled={req.status !== "pending"}
                       >
                         Pendiente
                       </option>
 
-                      <option
-                        value="scheduled"
-                        disabled={
-                          req.status !==
-                            "confirmed" &&
-                          req.status !==
-                            "scheduled"
-                        }
+                      {/* 3. Regla del Back: Si está Agendada, ocultamos o bloqueamos lo que no se puede */}
+                      <option 
+                        value="in_review" 
+                        disabled={req.status === "scheduled"}
                       >
-                        Agendada
-                      </option>
-
-                      <option value="in_review">
                         En revisión
                       </option>
 
@@ -271,8 +256,15 @@ export default function RequestsView() {
                         Esperando pago
                       </option>
 
-                      <option value="confirmed">
+                      <option 
+                        value="confirmed" 
+                        disabled={req.status === "scheduled"}
+                      >
                         Confirmada
+                      </option>
+
+                      <option value="scheduled">
+                        Agendada
                       </option>
 
                       <option value="cancelled">
