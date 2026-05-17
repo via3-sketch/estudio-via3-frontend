@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import GoogleButton from "./GoogleButton";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 
-import { registerUser } from "@/services/auth.service";
-import { loginUser } from "@/services/auth.service";
+import { registerUser, loginUser } from "@/services/auth.service";
 import { registerSchema } from "@/validations/register.validations";
 import { toast } from "sonner";
 import { useUser } from "@/hooks/useUser";
@@ -63,16 +63,27 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         email: result.data.email,
         password: result.data.password,
       });
+
       login(loginData.access_token);
       const returnTo = searchParams.get("returnTo");
+      const pending = localStorage.getItem("pendingRequest");
+
       if (returnTo) {
         router.push(returnTo);
+      } else if (pending) {
+        const { trainingId, categoria } = JSON.parse(pending);
+        localStorage.removeItem("pendingRequest");
+        router.push(
+          `/solicitudes?categoria=${encodeURIComponent(categoria)}&trainingId=${trainingId}`,
+        );
       } else {
         router.push("/plataforma");
       }
     } catch (err: any) {
       const mensajeBackend = err?.message || "Error al registrarse";
       toast.error(mensajeBackend);
+      // El detalle de UX del compañero
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -107,8 +118,7 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             </button>
           </div>
           <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-            Mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y
-            carácter especial.
+            Mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y carácter especial.
           </p>
         </div>
 
@@ -146,21 +156,18 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             defaultValue=""
             className="w-full rounded-xl border border-white/10 bg-[#0D0D0D] px-4 py-3 text-sm text-white outline-none transition focus:border-[#C7962D]"
           >
-            <option value="" disabled>
-              🌍 Seleccionar país
-            </option>
+            <option value="" disabled>🌍 Seleccionar país</option>
             <option value="Argentina">🇦🇷 Argentina</option>
-            <option value="Uruguay">🇺🇾 Uruguay</option>
-            <option value="Perú">🇺🇾 Uruguay</option>
-            <option value="Chile">🇨🇱 Chile</option>
             <option value="Brasil">🇧🇷 Brasil</option>
-            <option value="México">🇲🇽 México</option>
+            <option value="Chile">🇨🇱 Chile</option>
+            <option value="Colombia">🇨🇴 Colombia</option>
             <option value="España">🇪🇸 España</option>
             <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
+            <option value="México">🇲🇽 México</option>
+            <option value="Perú">🇵🇪 Perú</option>
+            <option value="Uruguay">🇺🇾 Uruguay</option>
           </select>
-          <p className="mt-2 text-xs text-gray-500">
-            País donde opera la empresa
-          </p>
+          <p className="mt-2 text-xs text-gray-500">País donde opera la empresa</p>
         </div>
 
         <div>
@@ -170,9 +177,7 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
 
         <div className="col-span-2">
           <Input name="companyName" type="text" placeholder="Empresa" />
-          <p className="mt-2 text-xs text-gray-500">
-            Nombre de la empresa o institución
-          </p>
+          <p className="mt-2 text-xs text-gray-500">Nombre de la empresa o institución</p>
         </div>
       </div>
 
@@ -185,13 +190,21 @@ export default function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         />
         <span>
           Acepto los{" "}
-          <span className="text-[#C7962D] cursor-pointer hover:underline">
+          <Link
+            href="/terminos"
+            target="_blank"
+            className="text-[#C7962D] cursor-pointer hover:underline"
+          >
             Términos y Condiciones
-          </span>{" "}
+          </Link>{" "}
           y la{" "}
-          <span className="text-[#C7962D] cursor-pointer hover:underline">
+          <Link
+            href="/privacidad"
+            target="_blank"
+            className="text-[#C7962D] cursor-pointer hover:underline"
+          >
             Política de Privacidad
-          </span>
+          </Link>
         </span>
       </div>
 

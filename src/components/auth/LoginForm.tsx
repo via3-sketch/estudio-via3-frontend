@@ -22,14 +22,17 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const searchParams = useSearchParams(); 
   const { login } = useUser();
   const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const form = e.currentTarget;
     const formData = new FormData(e.currentTarget);
+
     const payload = {
       email: formData.get("email")?.toString() || "",
       password: formData.get("password")?.toString() || "",
     };
+
     const result = loginSchema.safeParse(payload);
 
     if (!result.success) {
@@ -40,13 +43,21 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
     try {
       const data = await loginUser(result.data);
       const token = data.access_token;
+
       login(token);
       toast.success("Login exitoso");
       form.reset();
       const returnTo = searchParams.get("returnTo");
-      
+      const pending = localStorage.getItem("pendingRequest");
+
       if (returnTo) {
         router.push(returnTo);
+      } else if (pending) {
+        const { trainingId, categoria } = JSON.parse(pending);
+        localStorage.removeItem("pendingRequest");
+        router.push(
+          `/solicitudes?categoria=${encodeURIComponent(categoria)}&trainingId=${trainingId}`,
+        );
       } else {
         router.push("/");
       }

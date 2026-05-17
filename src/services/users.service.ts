@@ -10,3 +10,20 @@ export const getUsers = async (token: string, page: number = 1) => {
   }
   return response.json();
 };
+
+export const toggleUserStatus = async (userId: string, isActive: boolean, token: string) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ isActive }), 
+  });
+
+  if (!response.ok) {
+    throw new Error("Error al actualizar el estado del usuario");
+  }
+
+  return response.json();
+};

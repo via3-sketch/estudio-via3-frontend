@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { getUsers } from "@/services/users.service";
+import { getUsers, toggleUserStatus } from "@/services/users.service"; 
 
 type User = {
   id: string;
@@ -39,16 +40,41 @@ export default function UsersView() {
     };
     fetchUsers();
   }, [currentPage]); 
+
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
+  
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
   };
+
+  const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      await toggleUserStatus(userId, !currentStatus, token);
+
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, isActive: !currentStatus } : user
+        )
+      );
+
+      toast.success(
+        `Usuario ${!currentStatus ? "desbloqueado" : "bloqueado"} exitosamente`
+      );
+    } catch (error) {
+      console.error("Error al cambiar estado del usuario", error);
+      toast.error("Error al actualizar el estado del usuario");
+    }
+  };
+
   if (loading && users.length === 0) {
     return (
       <AdminLayout>
-        <div className="text-gray-400">Cargando usuarios...</div>
+        <div className="text-gray-400 animate-pulse">Cargando usuarios...</div>
       </AdminLayout>
     );
   }
@@ -62,14 +88,16 @@ export default function UsersView() {
           <p className="text-gray-400 mt-2">Gestión de usuarios registrados.</p>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5">
+      
+          <table className="w-full text-sm min-w-[800px]">
             <thead className="border-b border-white/10 text-gray-400">
               <tr>
                 <th className="text-left p-4">Nombre</th>
                 <th className="text-left p-4">Email</th>
                 <th className="text-left p-4">Rol</th> 
                 <th className="text-left p-4">Estado</th>
+                <th className="text-right p-4">Acciones</th>
               </tr>
             </thead>
 
@@ -96,10 +124,24 @@ export default function UsersView() {
                       {user.isActive !== false ? "Activo" : "Bloqueado"}
                     </span>
                   </td>
+
+                  <td className="p-4 text-right">
+                    <button
+                      onClick={() => handleToggleStatus(user.id, user.isActive !== false)}
+                      className={`text-xs px-3 py-1.5 rounded transition cursor-pointer font-medium border ${
+                        user.isActive !== false
+                          ? "border-red-500/30 text-red-400 hover:bg-red-500/10" 
+                          : "border-green-500/30 text-green-400 hover:bg-green-500/10"
+                      }`}
+                    >
+                      {user.isActive !== false ? "Bloquear" : "Desbloquear"}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-white/10 p-4">
               <span className="text-sm text-gray-400">
@@ -109,14 +151,14 @@ export default function UsersView() {
                 <button
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
-                  className="rounded bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded bg-white/5 px-4 py-2 text-sm text-white transition hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Anterior
                 </button>
                 <button
                   onClick={handleNextPage}
                   disabled={currentPage === totalPages}
-                  className="rounded bg-[#C7962D] px-4 py-2 text-sm text-white transition hover:bg-[#b08426] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="rounded bg-[#C7962D] px-4 py-2 text-sm text-white transition hover:bg-[#b08426] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Siguiente
                 </button>

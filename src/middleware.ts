@@ -23,18 +23,13 @@ export function middleware(request: NextRequest) {
     pathname === "/contacto" ||
     pathname.startsWith("/plataforma") ||   
     pathname.startsWith("/capacitaciones"); 
-
-
   const token = request.cookies.get("userSession")?.value;
-
   if (!token) {
     if (isPublicRoute) {
       return NextResponse.next(); 
     }
- 
     return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
-
   try {
     const user = jwtDecode<DecodedToken>(token);
     const isCompleteProfilePage = pathname === "/completar-perfil";
@@ -51,8 +46,7 @@ export function middleware(request: NextRequest) {
     }
 
     return NextResponse.next();
-
-  } catch (error) {
+  } catch {
     return NextResponse.redirect(new URL("/autenticacion", request.url));
   }
 }

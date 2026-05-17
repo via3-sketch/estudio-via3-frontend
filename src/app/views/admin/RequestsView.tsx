@@ -40,6 +40,7 @@ export default function RequestsView() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);  
+
   useEffect(() => {
     const fetchRequests = async () => {
       try {
@@ -96,14 +97,13 @@ export default function RequestsView() {
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/5">
-          
+        <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5">
           {loading ? (
             <div className="p-8 text-center text-gray-400 animate-pulse">
               Cargando página {page}...
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px]">
               <thead className="border-b border-white/10 text-gray-400">
                 <tr>
                   <th className="p-4 text-left">Empresa</th>
@@ -169,7 +169,7 @@ export default function RequestsView() {
                       </td>
                       <td className="p-4 text-right">
                         <Link href={`/admin/requests/${req.id}`}>
-                          <button className="text-[#C7962D] hover:underline">
+                          <button className="text-[#C7962D] hover:underline cursor-pointer">
                             Ver detalle
                           </button>
                         </Link>
@@ -186,7 +186,7 @@ export default function RequestsView() {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="rounded-md border border-white/10 bg-black/50 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="rounded-md border border-white/10 bg-black/50 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 ← Anterior
               </button>
@@ -198,7 +198,7 @@ export default function RequestsView() {
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="rounded-md border border-white/10 bg-black/50 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed"
+                className="rounded-md border border-white/10 bg-black/50 px-4 py-2 text-sm text-gray-300 transition hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
               >
                 Siguiente →
               </button>

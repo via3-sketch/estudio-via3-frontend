@@ -2,20 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
 import { useUser } from "@/hooks/useUser";
 import DropdownNotificaciones from "@/components/notifications/DropdownNotificaciones";
 
 export default function Navbar() {
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith("/autenticacion");
+  
   const [open, setOpen] = useState(false);
   const { isAuthenticated, logout, user } = useUser();
   const isAdmin = user?.role?.toLowerCase() === "admin";
+
   const handleLogout = () => {
     document.cookie = "userSession=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     logout();
   };
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = () => setOpen(false);
+    
+    setTimeout(() => document.addEventListener("click", handleClickOutside), 0);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [open]);
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#070707]/80 backdrop-blur border-b border-white/10">
@@ -23,15 +34,10 @@ export default function Navbar() {
         
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-4 shrink-0">
-          <img
-            src="/images/logo.png"
-            alt="Viacore"
-            className="h-9"
-          />
-          <span className="text-sm font-semibold text-white">
-            VIACORE
-          </span>
+          <img src="/images/logo.png" alt="Viacore" className="h-9" />
+          <span className="text-sm font-semibold text-white">VIACORE</span>
         </Link>
+        
         {!isAuthPage && (
           <>
             {/* NAV DESKTOP */}
@@ -57,7 +63,7 @@ export default function Navbar() {
 
             {/* MOBILE MENU TOGGLE */}
             <button
-              onClick={() => setOpen(!open)}
+              onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
               className="lg:hidden text-white text-2xl ml-auto"
             >
               ☰
@@ -96,7 +102,10 @@ export default function Navbar() {
 
       {/* MOBILE MENU DROPDOWN */}
       {open && !isAuthPage && (
-        <div className="lg:hidden bg-[#070707] border-t border-white/10 flex flex-col px-6 py-6 gap-4 text-sm text-gray-200">
+        <div 
+          className="lg:hidden bg-[#070707] border-t border-white/10 flex flex-col px-6 py-6 gap-4 text-sm text-gray-200 relative z-50"
+          onClick={(e) => e.stopPropagation()} 
+        >
           <Link href="/plataforma" onClick={() => setOpen(false)} className="hover:text-white transition">
             Plataforma
           </Link>
