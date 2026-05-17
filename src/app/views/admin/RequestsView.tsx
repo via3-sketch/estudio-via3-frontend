@@ -239,7 +239,7 @@ export default function RequestsView() {
                             .value as Request["status"],
                         )
                       }
-                      className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300"
+                      className="bg-transparent border border-white/10 rounded px-2 py-1 text-xs text-gray-300 cursor-pointer"
                     >
                       <option
                         value="pending"
@@ -285,7 +285,7 @@ export default function RequestsView() {
                     <Link
                       href={`/admin/requests/${req.id}`}
                     >
-                      <button className="text-[#C7962D] hover:underline">
+                      <button className="text-[#C7962D] hover:underline cursor-pointer">
                         Ver detalle
                       </button>
                     </Link>

@@ -68,8 +68,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
 
   } catch {
-    return NextResponse.redirect(
+    const response = NextResponse.redirect(
       new URL("/autenticacion", request.url)
     );
+
+      response.cookies.delete("userSession");
+
+  return response;
   }
 }

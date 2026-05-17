@@ -303,7 +303,7 @@ export default function CreateServiceForm({
                     index,
                   )
                 }
-                className="px-4 rounded-lg bg-red-500/20 text-red-400"
+                className="px-4 rounded-lg bg-red-500/20 text-red-400 cursor-pointer"
               >
                 -
               </button>
@@ -315,7 +315,7 @@ export default function CreateServiceForm({
         <button
           type="button"
           onClick={addInclude}
-          className="text-sm text-[#C7962D]"
+          className="text-sm text-[#C7962D] cursor-pointer"
         >
           + Agregar item
         </button>
@@ -336,7 +336,7 @@ export default function CreateServiceForm({
       />
 
       <Button
-        onClick={handleSubmit}
+        onClick={handleSubmit} className="cursor-pointer"
       >
         {loading
           ? "Guardando..."

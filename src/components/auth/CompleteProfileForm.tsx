@@ -1,65 +1,71 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
 import Input from "@/components/ui/Input";
-
 import Button from "@/components/ui/Button";
 
-import { completeProfile } from "@/services/auth.service"; 
+import { completeProfile } from "@/services/auth.service";
 
 import { toast } from "sonner";
 
+type DecodedToken = {
+  id: string;
+};
+
 export default function CompleteProfileForm() {
-  const router = useRouter();
 
   const handleSubmit = async (
     e: any,
   ) => {
     e.preventDefault();
 
-    const form =
-      e.currentTarget;
+    const form = e.currentTarget;
 
-    const formData = new FormData(
-      form,
-    );
+    const formData = new FormData(form);
 
     const payload = {
       phone:
-        formData
-          .get("phone")
-          ?.toString() || "",
+        formData.get("phone")?.toString() || "",
 
       country:
-        formData
-          .get("country")
-          ?.toString() || "",
+        formData.get("country")?.toString() || "",
 
       companyName:
-        formData
-          .get("companyName")
-          ?.toString() || "",
+        formData.get("companyName")?.toString() || "",
 
       city:
-        formData
-          .get("city")
-          ?.toString() || "",
+        formData.get("city")?.toString() || "",
 
       address:
-        formData
-          .get("address")
-          ?.toString() || "",
+        formData.get("address")?.toString() || "",
     };
 
     try {
-      const res = await completeProfile(
-        payload,
-      );
+      const token = document.cookie
+        .split("; ")
+        .find((row) =>
+          row.startsWith("userSession="),
+        )
+        ?.split("=")[1];
 
-      localStorage.setItem("token", res.access_token);
+      if (!token) {
+        throw new Error("No token found");
+      }
 
-      document.cookie = `userSession=${res.access_token}; path=/`;
+      const decoded =
+        jwtDecode<DecodedToken>(token);
+
+      const id = decoded.id;
+
+      const res =
+        await completeProfile(
+          id,
+          payload,
+        );
+
+      document.cookie =
+        `userSession=${res.access_token}; path=/; max-age=604800; SameSite=Lax`;
 
       toast.success(
         "Perfil completado",
@@ -67,12 +73,14 @@ export default function CompleteProfileForm() {
 
       form.reset();
 
-      router.push("/");
+      window.location.href = "/";
 
     } catch (err: any) {
-      toast.error(err.message)
+
+      console.log(err);
 
       toast.error(
+        err?.message ||
         "Error al completar perfil",
       );
     }
