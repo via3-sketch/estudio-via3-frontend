@@ -25,13 +25,8 @@ export function middleware(request: NextRequest) {
 
   const isAuthPage = pathname === "/autenticacion";
   const isCompleteProfile = pathname === "/completar-perfil";
-  const isHome = pathname === "/"; // ← agregue isHome
-  const isPublic =
-    pathname.startsWith("/solicitudes") ||
-    pathname.startsWith("/plataforma") ||
-    pathname.startsWith("/capacitaciones"); // ← agregue isPublic
 
-  if (isAuthPage || isCompleteProfile || isHome || isPublic) {
+  if (isAuthPage || isCompleteProfile) {
     // ← agregue isHome e isPublic
     return NextResponse.next();
   }
