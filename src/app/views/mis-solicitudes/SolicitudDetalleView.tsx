@@ -270,14 +270,14 @@ export default function SolicitudDetalleView({
         </div>
 
         {solicitud.status === "in_review" && !tieneAgenda && (
-          <div className="mt-10 flex justify-between items-center border border-blue-500/20 bg-blue-500/10 rounded-xl p-5">
+          <div className="mt-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border border-blue-500/20 bg-blue-500/10 rounded-xl p-5">
             <span className="text-sm text-blue-300">
               Tu solicitud fue aprobada para coordinación inicial.
             </span>
 
             <Link
               href={`/agenda/${solicitud.id}`}
-              className="px-6 py-3 bg-blue-500 text-white rounded-md font-semibold hover:opacity-90 transition"
+              className="px-6 py-3 bg-blue-500 text-white rounded-md font-semibold hover:opacity-90 transition text-center"
             >
               Agendar reunión
             </Link>
@@ -285,14 +285,14 @@ export default function SolicitudDetalleView({
         )}
 
         {solicitud.status === "scheduled" && (
-          <div className="mt-10 flex justify-between items-center border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
+          <div className="mt-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border border-[#C7962D]/20 bg-[#C7962D]/10 rounded-xl p-5">
             <span className="text-sm text-[#F4D27A]">
               La reunión fue coordinada correctamente.
             </span>
 
             <Link
               href={`/pago/${solicitud.id}`}
-              className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold"
+              className="px-6 py-3 bg-[#C7962D] text-black rounded-md font-semibold text-center"
             >
               Continuar al pago
             </Link>
@@ -301,7 +301,7 @@ export default function SolicitudDetalleView({
 
         <Link
           href="/mis-solicitudes"
-          className="text-[#C7962D] hover:underline"
+          className="text-[#C7962D] hover:underline mt-6 inline-block"
         >
           ← Volver
         </Link>

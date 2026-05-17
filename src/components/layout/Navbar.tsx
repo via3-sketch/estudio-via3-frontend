@@ -105,7 +105,7 @@ export default function Navbar() {
       </div>
 
       {open && !isAuth && (
-        <div className="lg:hidden bg-[#070707] border-t border-white/10 flex flex-col px-6 py-6 gap-4 text-sm text-gray-200">
+        <div className="lg:hidden bg-[#070707] border-t border-white/10 flex flex-col px-6 py-6 gap-4 text-sm text-gray-200 relative z-50">
           <Link
             href="/plataforma"
             onClick={() => setOpen(false)}
