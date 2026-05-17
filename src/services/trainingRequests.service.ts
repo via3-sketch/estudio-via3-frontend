@@ -1,9 +1,9 @@
 import { api } from "./api";
 
 export const getTrainingRequests = async (
-  token: string,
+  token: string, ...params: string[]
 ) => {
-  return await api("/training-requests", {
+  return await api(`/training-requests${params ? params.map(p => "?"+p ).join("&") : ""}`, {
     method: "GET",
 
     headers: {

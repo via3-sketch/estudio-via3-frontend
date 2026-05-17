@@ -6,12 +6,16 @@ import { useEffect, useState } from "react";
 
 import { createTrainingRequest } from "@/services/trainingRequests.service";
 
+import { trainingRequestSchema } from "@/validations/trainingRequest.validations";
+
 export default function SolicitudesView() {
   const searchParams = useSearchParams();
 
   const router = useRouter();
 
   const [trainingId, setTrainingId] = useState("");
+
+  const [errors, setErrors] = useState<any>({});
 
   const [form, setForm] = useState({
     categoria: "",
@@ -45,11 +49,21 @@ export default function SolicitudesView() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setForm({
+    const updatedForm = {
       ...form,
 
       [e.target.name]: e.target.value,
-    });
+    };
+
+    setForm(updatedForm)
+
+    const resultado = trainingRequestSchema.safeParse(updatedForm)
+
+    if (!resultado.success) {
+      setErrors(resultado.error.format());
+    } else {
+      setErrors({});
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -116,7 +130,7 @@ export default function SolicitudesView() {
               value={form.categoria}
               disabled
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
-            />
+            /> 
           </div>
 
           <div>
@@ -133,6 +147,12 @@ export default function SolicitudesView() {
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
               required
             />
+
+            {errors.personas?._errors?.[0] && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.personas._errors[0]}
+              </p>
+            )}
           </div>
 
           <div>
@@ -146,6 +166,12 @@ export default function SolicitudesView() {
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
               required
             />
+
+            {errors.objetivo?._errors?.[0] && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.objetivo._errors[0]}
+              </p>
+            )}
           </div>
 
           <div>
@@ -159,6 +185,12 @@ export default function SolicitudesView() {
               className="w-full mt-2 p-3 rounded-md bg-white/5 border border-white/10"
               required
             />
+
+            {errors.contexto?._errors?.[0] && (
+              <p className="text-red-400 text-sm mt-1">
+                {errors.contexto._errors[0]}
+              </p>
+            )}
           </div>
 
           <button
