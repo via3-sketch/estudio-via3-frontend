@@ -36,8 +36,6 @@ export default function Navbar() {
 
       <div className="mx-auto max-w-7xl px-6 h-16 flex items-center gap-8">
 
-        {/* LOGO */}
-
         <Link
           href="/"
           className="flex items-center gap-4 shrink-0"
@@ -57,8 +55,6 @@ export default function Navbar() {
 
         {!isAuth && (
           <>
-
-            {/* NAV */}
 
             <nav className="hidden lg:flex flex-1 items-center justify-center gap-8 text-sm text-gray-200">
 
@@ -94,8 +90,6 @@ export default function Navbar() {
 
             </nav>
 
-            {/* MOBILE MENU */}
-
             <button
               onClick={() =>
                 setOpen(!open)
@@ -125,8 +119,6 @@ export default function Navbar() {
                   </span>
 
                 </div>
-
-                {/* LOGOUT */}
 
                 <button
                   onClick={logout}
