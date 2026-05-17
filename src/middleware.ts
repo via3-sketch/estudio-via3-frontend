@@ -27,7 +27,6 @@ export function middleware(request: NextRequest) {
   const isCompleteProfile = pathname === "/completar-perfil";
 
   if (isAuthPage || isCompleteProfile) {
-    // ← agregue isHome e isPublic
     return NextResponse.next();
   }
 
