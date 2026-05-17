@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { usePathname } from "next/navigation";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useUser } from "@/hooks/useUser";
 
@@ -20,6 +20,16 @@ export default function Navbar() {
   const { isAuthenticated, logout, user } = useUser();
 
   const isAdmin = user?.role?.toLowerCase() === "admin";
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = () => setOpen(false);
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [open]);
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#070707]/80 backdrop-blur border-b border-white/10">
