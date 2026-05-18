@@ -71,6 +71,7 @@ export default function CompleteProfileForm() {
     try {
       setLoading(true);
       const res = await completeProfile(decoded.id, formData);
+      console.log("Respuesta del backend:", res);
 
       // 1. Actualiza localStorage y cookie
       localStorage.setItem("token", res.access_token);
