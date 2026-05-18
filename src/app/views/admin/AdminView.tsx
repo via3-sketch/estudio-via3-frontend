@@ -58,6 +58,8 @@ export default function AdminView() {
           trainings: requestsArray.filter(
             (req: any) => req.status === "confirmed",
           ).length,
+
+          trainings: requestsArray.filter((r: any) => r.status == "confirmed").length,
         });
 
         setTrainings(trainingsData);
