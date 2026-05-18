@@ -119,7 +119,7 @@ export default function CompleteProfileForm() {
       setErrors(fieldErrors);
 
       toast.error(
-        "Revis谩 los campos",
+        "Revisá los campos",
       );
 
       return;
@@ -136,6 +136,7 @@ export default function CompleteProfileForm() {
       const res =
         await completeProfile(
           decoded.id,
+          token,
           formData,
         );
 
@@ -189,14 +190,14 @@ export default function CompleteProfileForm() {
           <Input
             name="phone"
             type="tel"
-            placeholder="Tel茅fono"
+            placeholder="Teléfono"
             value={formData.phone}
             onChange={handleChange}
             error={errors.phone}
           />
 
           <p className="mt-2 text-xs text-gray-500">
-            N煤mero de contacto de la
+            Número de contacto de la
             empresa
           </p>
         </div>
@@ -213,35 +214,35 @@ export default function CompleteProfileForm() {
             }`}
           >
             <option value="">
-              馃實 Seleccionar pa铆s
+              🌍 Seleccionar país
             </option>
 
             <option value="Argentina">
-              馃嚘馃嚪 Argentina
+              🇦🇷 Argentina
             </option>
 
             <option value="Uruguay">
-              馃嚭馃嚲 Uruguay
+              🇺🇾 Uruguay
             </option>
 
             <option value="Chile">
-              馃嚚馃嚤 Chile
+              🇨🇱 Chile
             </option>
 
             <option value="Brasil">
-              馃嚙馃嚪 Brasil
+              🇧🇷 Brasil
             </option>
 
-            <option value="M茅xico">
-              馃嚥馃嚱 M茅xico
+            <option value="México">
+              🇲🇽 México
             </option>
 
-            <option value="Espa帽a">
-              馃嚜馃嚫 Espa帽a
+            <option value="España">
+              🇪🇸 España
             </option>
 
             <option value="Estados Unidos">
-              馃嚭馃嚫 Estados Unidos
+              🇺🇸 Estados Unidos
             </option>
           </select>
 
@@ -252,7 +253,7 @@ export default function CompleteProfileForm() {
           )}
 
           <p className="text-xs text-gray-500">
-            Pa铆s donde opera la
+            País donde opera la
             empresa
           </p>
         </div>
@@ -276,14 +277,14 @@ export default function CompleteProfileForm() {
           <Input
             name="address"
             type="text"
-            placeholder="Direcci贸n"
+            placeholder="Dirección"
             value={formData.address}
             onChange={handleChange}
             error={errors.address}
           />
 
           <p className="mt-2 text-xs text-gray-500">
-            Direcci贸n empresarial
+            Dirección empresarial
           </p>
         </div>
 
@@ -299,7 +300,7 @@ export default function CompleteProfileForm() {
 
           <p className="mt-2 text-xs text-gray-500">
             Nombre de la empresa o
-            instituci贸n
+            institución
           </p>
         </div>
       </div>
@@ -310,7 +311,7 @@ export default function CompleteProfileForm() {
       >
         {loading
           ? "Guardando..."
-          : "Finalizar configuraci贸n"}
+          : "Finalizar configuración"}
       </Button>
     </form>
   );
