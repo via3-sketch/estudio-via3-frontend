@@ -52,12 +52,11 @@ export default function AdminView() {
         setStats({
           users: users.length,
 
-          requests: requestsArray.filter((r: any) => r.status == "confirmed")
-            .length,
-
-          trainings: requestsArray.filter(
+          requests: requestsArray.filter(
             (req: any) => req.status != "confirmed",
           ).length,
+
+          trainings: requestsArray.filter((r: any) => r.status == "confirmed").length,
         });
 
         setTrainings(trainingsData);
