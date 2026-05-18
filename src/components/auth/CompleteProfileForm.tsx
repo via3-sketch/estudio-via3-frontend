@@ -134,11 +134,11 @@ export default function CompleteProfileForm() {
       setLoading(true);
 
       const res =
-        await completeProfile(
-          decoded.id,
-          formData,
-        );
-
+       await completeProfile(
+        decoded.id,
+        token,
+        formData,
+      );
       console.log(
         "Respuesta del backend:",
         res,
