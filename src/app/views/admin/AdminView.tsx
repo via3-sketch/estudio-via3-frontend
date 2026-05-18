@@ -40,7 +40,7 @@ export default function AdminView() {
 
         if (!token) return;
 
-        const [users, requests, trainingsData] = await Promise.all([
+        const [usersData, requests, trainingsData] = await Promise.all([
           getUsers(token),
 
           getTrainingRequests(token),
@@ -50,13 +50,13 @@ export default function AdminView() {
 
         const requestsArray = requests?.data ?? [];
         setStats({
-          users: users.length,
+          users: usersData.total,
 
-          requests: requestsArray.filter((r: any) => r.status == "confirmed")
+          requests: requestsArray.filter((r: any) => r.status !== "confirmed")
             .length,
 
           trainings: requestsArray.filter(
-            (req: any) => req.status != "confirmed",
+            (req: any) => req.status === "confirmed",
           ).length,
         });
 

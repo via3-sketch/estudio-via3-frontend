@@ -25,7 +25,8 @@ export function middleware(request: NextRequest) {
     pathname === "/autenticacion" ||
     pathname === "/contacto" ||
     pathname.startsWith("/plataforma") ||
-    pathname.startsWith("/capacitaciones");
+    pathname.startsWith("/capacitaciones") ||
+    pathname.startsWith("/casos");
 
   const token = request.cookies.get("userSession")?.value;
 
