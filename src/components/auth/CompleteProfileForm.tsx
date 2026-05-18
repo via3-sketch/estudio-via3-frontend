@@ -1,3 +1,4 @@
+// CompleteProfileForm.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -30,7 +31,9 @@ export default function CompleteProfileForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     const updatedValues = { ...formData, [name]: value };
     setFormData(updatedValues);
@@ -70,7 +73,7 @@ export default function CompleteProfileForm() {
 
     try {
       setLoading(true);
-      const res = await completeProfile(decoded.id, formData);
+      const res = await completeProfile(decoded.id, token, formData);
       console.log("Respuesta del backend:", res);
 
       // 1. Actualiza localStorage y cookie
@@ -115,7 +118,9 @@ export default function CompleteProfileForm() {
             value={formData.country}
             onChange={handleChange}
             className={`w-full rounded-xl border bg-[#0D0D0D] px-4 py-3 text-sm text-white outline-none transition ${
-              errors.country ? "border-red-500" : "border-white/10 focus:border-[#C7962D]"
+              errors.country
+                ? "border-red-500"
+                : "border-white/10 focus:border-[#C7962D]"
             }`}
           >
             <option value="">🌍 Seleccionar país</option>
@@ -127,7 +132,9 @@ export default function CompleteProfileForm() {
             <option value="España">🇪🇸 España</option>
             <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
           </select>
-          {errors.country && <p className="text-sm text-red-400">{errors.country}</p>}
+          {errors.country && (
+            <p className="text-sm text-red-400">{errors.country}</p>
+          )}
           <p className="text-xs text-gray-500">País donde opera la empresa</p>
         </div>
 
@@ -164,7 +171,9 @@ export default function CompleteProfileForm() {
             onChange={handleChange}
             error={errors.companyName}
           />
-          <p className="mt-2 text-xs text-gray-500">Nombre de la empresa o institución</p>
+          <p className="mt-2 text-xs text-gray-500">
+            Nombre de la empresa o institución
+          </p>
         </div>
       </div>
 
