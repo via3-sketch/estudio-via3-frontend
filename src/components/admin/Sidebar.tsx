@@ -1,5 +1,4 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
@@ -97,29 +96,21 @@ export default function Sidebar() {
       <div className="hidden md:block space-y-4">
 
         <div className="border-t border-white/10 pt-4 space-y-2 text-sm">
-
           <Link
             href="/plataforma"
             className="block px-3 py-2 text-gray-400 hover:text-white transition"
           >
             ← Volver al sitio
           </Link>
-
           <button
             onClick={handleLogout}
             className="w-full text-left px-3 py-2 rounded-md text-red-400 hover:bg-red-500/10 transition cursor-pointer"
           >
             Cerrar sesión
           </button>
-
         </div>
-
-        <div className="text-sm text-gray-500 px-3">
-          Admin v1.0
-        </div>
-
+        <div className="text-sm text-gray-500 px-3">Admin v1.0</div>
       </div>
-
     </aside>
   );
 }
