@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import { completeProfile } from "@/services/auth.service";
 import { toast } from "sonner";
 import { completeProfileSchema } from "@/validations/completeProfile.validations";
+import { useUserContext } from "@/context/UserContext";
 
 type DecodedToken = {
   id: string;
@@ -16,6 +17,7 @@ type DecodedToken = {
 
 export default function CompleteProfileForm() {
   const router = useRouter();
+  const { login } = useUserContext();
 
   const [formData, setFormData] = useState({
     phone: "",
@@ -69,10 +71,19 @@ export default function CompleteProfileForm() {
     try {
       setLoading(true);
       const res = await completeProfile(decoded.id, formData);
+
+      // 1. Actualiza localStorage y cookie
       localStorage.setItem("token", res.access_token);
       document.cookie = `userSession=${res.access_token}; path=/; max-age=604800; SameSite=Lax`;
+
+      // 2. Sincroniza el UserContext con el nuevo token
+      login(res.access_token);
+
       setFormData({ phone: "", country: "", companyName: "", city: "", address: "" });
       setErrors({});
+
+      // 3. Refresca el servidor para que el middleware lea la nueva cookie, luego navega
+      router.refresh();
       router.push("/");
     } catch (err) {
       console.error(err);
