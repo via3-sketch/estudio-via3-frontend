@@ -1,13 +1,12 @@
+```tsx
 "use client";
 
 import React, { useState } from "react";
-
 import { jwtDecode } from "jwt-decode";
-
 import type { ZodIssue } from "zod";
+import { useRouter } from "next/navigation";
 
 import Input from "@/components/ui/Input";
-
 import Button from "@/components/ui/Button";
 
 import { completeProfile } from "@/services/auth.service";
@@ -22,34 +21,41 @@ type DecodedToken = {
   id: string;
 };
 
+type FormData = {
+  phone: string;
+  country: string;
+  companyName: string;
+  city: string;
+  address: string;
+};
+
 export default function CompleteProfileForm() {
-  const { login } =
-    useUserContext();
+  const router = useRouter();
 
-  const [formData, setFormData] =
-    useState({
-      phone: "",
-      country: "",
-      companyName: "",
-      city: "",
-      address: "",
-    });
+  const userContext = useUserContext();
 
-  const [errors, setErrors] =
-    useState<Record<string, string>>(
-      {},
-    );
+  if (!userContext) {
+    throw new Error("UserContext no disponible");
+  }
 
-  const [loading, setLoading] =
-    useState(false);
+  const { login } = userContext;
+
+  const [formData, setFormData] = useState<FormData>({
+    phone: "",
+    country: "",
+    companyName: "",
+    city: "",
+    address: "",
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement
-    >,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
-    const { name, value } =
-      e.target;
+    const { name, value } = e.target;
 
     const updatedValues = {
       ...formData,
@@ -59,25 +65,16 @@ export default function CompleteProfileForm() {
     setFormData(updatedValues);
 
     const result =
-      completeProfileSchema.safeParse(
-        updatedValues,
-      );
+      completeProfileSchema.safeParse(updatedValues);
 
     if (!result.success) {
-      const fieldErrors: Record<
-        string,
-        string
-      > = {};
+      const fieldErrors: Record<string, string> = {};
 
-      result.error.issues.forEach(
-        (issue: ZodIssue) => {
-          const field =
-            issue.path[0] as string;
+      result.error.issues.forEach((issue: ZodIssue) => {
+        const field = issue.path[0] as string;
 
-          fieldErrors[field] =
-            issue.message;
-        },
-      );
+        fieldErrors[field] = issue.message;
+      });
 
       setErrors(fieldErrors);
     } else {
@@ -90,55 +87,45 @@ export default function CompleteProfileForm() {
   ) => {
     e.preventDefault();
 
-    const token =
-      localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-    if (!token) return;
-
-    const validation =
-      completeProfileSchema.safeParse(
-        formData,
-      );
-
-    if (!validation.success) {
-      const fieldErrors: Record<
-        string,
-        string
-      > = {};
-
-      validation.error.issues.forEach(
-        (issue: ZodIssue) => {
-          const field =
-            issue.path[0] as string;
-
-          fieldErrors[field] =
-            issue.message;
-        },
-      );
-
-      setErrors(fieldErrors);
-
-      toast.error(
-        "Revis谩 los campos",
-      );
+    if (!token) {
+      toast.error("Sesión no encontrada");
 
       return;
     }
 
-    const decoded =
-      jwtDecode<DecodedToken>(
-        token,
-      );
+    const validation =
+      completeProfileSchema.safeParse(formData);
+
+    if (!validation.success) {
+      const fieldErrors: Record<string, string> = {};
+
+      validation.error.issues.forEach((issue: ZodIssue) => {
+        const field = issue.path[0] as string;
+
+        fieldErrors[field] = issue.message;
+      });
+
+      setErrors(fieldErrors);
+
+      toast.error("Revisá los campos");
+
+      return;
+    }
 
     try {
       setLoading(true);
 
-      const res =
-       await completeProfile(
+      const decoded =
+        jwtDecode<DecodedToken>(token);
+
+      const res = await completeProfile(
         decoded.id,
         token,
         formData,
       );
+
       console.log(
         "Respuesta del backend:",
         res,
@@ -167,7 +154,7 @@ export default function CompleteProfileForm() {
         "Perfil completado correctamente",
       );
 
-      window.location.href = "/";
+      router.push("/");
     } catch (err) {
       console.error(err);
 
@@ -189,15 +176,14 @@ export default function CompleteProfileForm() {
           <Input
             name="phone"
             type="tel"
-            placeholder="Tel茅fono"
+            placeholder="Teléfono"
             value={formData.phone}
             onChange={handleChange}
             error={errors.phone}
           />
 
           <p className="mt-2 text-xs text-gray-500">
-            N煤mero de contacto de la
-            empresa
+            Número de contacto de la empresa
           </p>
         </div>
 
@@ -213,35 +199,35 @@ export default function CompleteProfileForm() {
             }`}
           >
             <option value="">
-              馃實 Seleccionar pa铆s
+              🌎 Seleccionar país
             </option>
 
             <option value="Argentina">
-              馃嚘馃嚪 Argentina
+              🇦🇷 Argentina
             </option>
 
             <option value="Uruguay">
-              馃嚭馃嚲 Uruguay
+              🇺🇾 Uruguay
             </option>
 
             <option value="Chile">
-              馃嚚馃嚤 Chile
+              🇨🇱 Chile
             </option>
 
             <option value="Brasil">
-              馃嚙馃嚪 Brasil
+              🇧🇷 Brasil
             </option>
 
-            <option value="M茅xico">
-              馃嚥馃嚱 M茅xico
+            <option value="México">
+              🇲🇽 México
             </option>
 
-            <option value="Espa帽a">
-              馃嚜馃嚫 Espa帽a
+            <option value="España">
+              🇪🇸 España
             </option>
 
             <option value="Estados Unidos">
-              馃嚭馃嚫 Estados Unidos
+              🇺🇸 Estados Unidos
             </option>
           </select>
 
@@ -252,8 +238,7 @@ export default function CompleteProfileForm() {
           )}
 
           <p className="text-xs text-gray-500">
-            Pa铆s donde opera la
-            empresa
+            País donde opera la empresa
           </p>
         </div>
 
@@ -276,14 +261,14 @@ export default function CompleteProfileForm() {
           <Input
             name="address"
             type="text"
-            placeholder="Direcci贸n"
+            placeholder="Dirección"
             value={formData.address}
             onChange={handleChange}
             error={errors.address}
           />
 
           <p className="mt-2 text-xs text-gray-500">
-            Direcci贸n empresarial
+            Dirección empresarial
           </p>
         </div>
 
@@ -298,8 +283,7 @@ export default function CompleteProfileForm() {
           />
 
           <p className="mt-2 text-xs text-gray-500">
-            Nombre de la empresa o
-            instituci贸n
+            Nombre de la empresa o institución
           </p>
         </div>
       </div>
@@ -310,8 +294,9 @@ export default function CompleteProfileForm() {
       >
         {loading
           ? "Guardando..."
-          : "Finalizar configuraci贸n"}
+          : "Finalizar configuración"}
       </Button>
     </form>
   );
 }
+```
