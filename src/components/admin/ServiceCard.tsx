@@ -166,6 +166,7 @@ export default function ServicesView() {
                     alt={service.title}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
                   />
                 </div>
 
@@ -193,7 +194,7 @@ export default function ServicesView() {
                           service.id,
                         )
                       }
-                      className="text-sm text-red-400 hover:text-red-300 transition"
+                      className="text-sm text-red-400 hover:text-red-300 transition cursor-pointer"
                     >
                       Eliminar
                     </button>
