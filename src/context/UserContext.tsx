@@ -125,7 +125,7 @@ export function UserProvider({
 
       document.cookie = `userSession=${newToken}; path=/; max-age=86400`;
 
-      setToken(newToken);
+    setToken(newToken);
 
       const decoded =
         jwtDecode<DecodedToken>(
